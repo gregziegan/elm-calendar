@@ -62,11 +62,11 @@ update msg state =
 
         PageBack ->
             state
-                |> page 1
+                |> page -1
 
         PageForward ->
             state
-                |> page -1
+                |> page 1
 
 
 page : Int -> State -> State
@@ -176,11 +176,7 @@ getMonthRange date =
             Date.Extra.range Date.Extra.Day 1 begMonth endMonth
 
         previousMonthFirstDate =
-            Date.Extra.weekdayNumber begMonth
-                |> toFloat
-                |> (*) (24 * Time.hour)
-                |> (-) (Date.toTime begMonth)
-                |> Date.fromTime
+            Date.Extra.add Date.Extra.Day (-1 * (7 - endOfMonthWeekdayNum)) endMonth
 
         previousMonthRange =
             Date.Extra.range Date.Extra.Day 1 previousMonthFirstDate begMonth
