@@ -20,7 +20,7 @@ type alias Model =
 
 model : Model
 model =
-    { calendarState = Calendar.init "Month" (Date.fromTime 1473649550) }
+    { calendarState = Calendar.init "Month" (Date.fromTime 1473652025106) }
 
 
 type Msg

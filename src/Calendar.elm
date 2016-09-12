@@ -1,6 +1,7 @@
 module Calendar exposing (..)
 
 import Html exposing (..)
+import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
@@ -21,15 +22,68 @@ init timespan viewing =
     }
 
 
+type TimeSpan
+    = Month
+    | Week
+    | Day
+    | Agenda
+
+
+toTimeSpan : String -> TimeSpan
+toTimeSpan timespan =
+    case timespan of
+        "Month" ->
+            Month
+
+        "Week" ->
+            Week
+
+        "Day" ->
+            Day
+
+        "Agenda" ->
+            Agenda
+
+        _ ->
+            Month
+
+
 type Msg
     = ChangeTimespan String
+    | PageBack
+    | PageForward
 
 
-update msg model =
+update msg state =
     case msg of
         ChangeTimespan newTimespan ->
-            model
+            state
                 |> changeTimespan newTimespan
+
+        PageBack ->
+            state
+                |> page 1
+
+        PageForward ->
+            state
+                |> page -1
+
+
+page : Int -> State -> State
+page step state =
+    let
+        { timespan, viewing } =
+            state
+
+        timespanType =
+            toTimeSpan timespan
+    in
+        case timespanType of
+            Month ->
+                { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
+
+            _ ->
+                state
 
 
 changeTimespan timespan model =
@@ -67,15 +121,25 @@ styleCalendar =
         ]
 
 
-viewTitle state =
-    div []
-        [ h2 [] [ text "September 2016" ] ]
+viewTitle { viewing } =
+    let
+        month =
+            toString <| Date.month viewing
+
+        year =
+            toString <| Date.year viewing
+
+        title =
+            month ++ " " ++ year
+    in
+        div []
+            [ h2 [] [ text title ] ]
 
 
 viewPagination state =
     div []
-        [ button [ styleButton ] [ text "back" ]
-        , button [ styleButton ] [ text "next" ]
+        [ button [ styleButton, onClick PageBack ] [ text "back" ]
+        , button [ styleButton, onClick PageForward ] [ text "next" ]
         ]
 
 
@@ -94,11 +158,6 @@ styleButton =
         , ( "padding", "5px" )
         , ( "background-color", "white" )
         ]
-
-
-
--- 28 -> 1
--- 5 weeks
 
 
 getMonthRange : Date -> List (List Date)
@@ -142,8 +201,12 @@ getMonthRange date =
         , List.drop 7 <| List.take 14 fullRange
         , List.drop 14 <| List.take 21 fullRange
         , List.drop 21 <| List.take 28 fullRange
-        , List.drop 28 fullRange
+        , List.drop 28 <| List.take 35 fullRange
         ]
+            ++ if List.length fullRange > 35 then
+                [ List.drop 35 <| List.take 42 fullRange ]
+               else
+                []
 
 
 viewMonth : State -> Html Msg
