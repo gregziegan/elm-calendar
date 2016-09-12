@@ -212,11 +212,14 @@ getMonthRange date =
         endMonth =
             Date.Extra.ceiling Date.Extra.Month date
 
+        begOfMonthWeekdayNum =
+            Date.Extra.weekdayNumber begMonth
+
         monthRange =
             Date.Extra.range Date.Extra.Day 1 begMonth endMonth
 
         previousMonthFirstDate =
-            Date.Extra.add Date.Extra.Day (-1 * (7 - endOfMonthWeekdayNum)) endMonth
+            Date.Extra.add Date.Extra.Day (-1 * begOfMonthWeekdayNum) begMonth
 
         previousMonthRange =
             Date.Extra.range Date.Extra.Day 1 previousMonthFirstDate begMonth
