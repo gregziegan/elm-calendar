@@ -3,15 +3,18 @@ module Calendar exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
+import Date.Extra
+import Date.Extra.Facts
+import Time
 
 
 type alias State =
     { timespan : String
-    , viewing : Int
+    , viewing : Date
     }
 
 
-init : String -> Int -> State
+init : String -> Date -> State
 init timespan viewing =
     { timespan = timespan
     , viewing = viewing
@@ -98,18 +101,57 @@ styleButton =
 -- 5 weeks
 
 
-september2016 =
-    [ [ 28, 29, 30, 31, 1, 2, 3 ]
-    , [ 4, 5, 6, 7, 8, 9, 10 ]
-    , [ 11, 12, 13, 14, 15, 16, 17 ]
-    , [ 18, 19, 20, 21, 22, 23, 24 ]
-    , [ 25, 26, 27, 28, 29, 30, 1 ]
-    ]
+getMonthRange : Date -> List (List Date)
+getMonthRange date =
+    let
+        curMonth =
+            Date.month date
+
+        begMonth =
+            Date.Extra.floor Date.Extra.Month date
+
+        endMonth =
+            Date.Extra.ceiling Date.Extra.Month date
+
+        monthRange =
+            Date.Extra.range Date.Extra.Day 1 begMonth endMonth
+
+        previousMonthFirstDate =
+            Date.Extra.weekdayNumber begMonth
+                |> toFloat
+                |> (*) (24 * Time.hour)
+                |> (-) (Date.toTime begMonth)
+                |> Date.fromTime
+
+        previousMonthRange =
+            Date.Extra.range Date.Extra.Day 1 previousMonthFirstDate begMonth
+
+        endOfMonthWeekdayNum =
+            Date.Extra.weekdayNumber endMonth
+
+        nextMonthLastDate =
+            Date.Extra.add Date.Extra.Day (7 - endOfMonthWeekdayNum) endMonth
+
+        nextMonthRange =
+            Date.Extra.range Date.Extra.Day 1 endMonth nextMonthLastDate
+
+        fullRange =
+            List.concat [ previousMonthRange, monthRange, nextMonthRange ]
+    in
+        [ List.take 7 fullRange
+        , List.drop 7 <| List.take 14 fullRange
+        , List.drop 14 <| List.take 21 fullRange
+        , List.drop 21 <| List.take 28 fullRange
+        , List.drop 28 fullRange
+        ]
 
 
 viewMonth : State -> Html Msg
 viewMonth state =
     let
+        weeks =
+            getMonthRange state.viewing
+
         styleWeek =
             style
                 [ ( "display", "flex" )
@@ -120,7 +162,7 @@ viewMonth state =
                 (List.map (viewCell state) week)
     in
         div [ styleMonth ]
-            (List.map viewWeek september2016)
+            (List.map viewWeek weeks)
 
 
 styleMonth : Html.Attribute Msg
@@ -133,10 +175,10 @@ styleMonth =
         ]
 
 
-viewCell : State -> Int -> Html Msg
+viewCell : State -> Date -> Html Msg
 viewCell state date =
     div [ styleCell ]
-        [ text <| toString <| date ]
+        [ text <| toString <| Date.day date ]
 
 
 styleCell : Html.Attribute Msg

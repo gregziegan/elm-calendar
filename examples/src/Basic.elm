@@ -3,6 +3,7 @@ module Basic exposing (..)
 import Html exposing (..)
 import Html.App as Html
 import Calendar
+import Date
 
 
 main =
@@ -19,7 +20,7 @@ type alias Model =
 
 model : Model
 model =
-    { calendarState = Calendar.init "Month" 3 }
+    { calendarState = Calendar.init "Month" (Date.fromTime 1473649550) }
 
 
 type Msg
