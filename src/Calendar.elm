@@ -5,8 +5,6 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
-import Date.Extra.Facts
-import Time
 
 
 type alias State =
@@ -48,18 +46,30 @@ toTimeSpan timespan =
             Month
 
 
+fromTimeSpan : TimeSpan -> String
+fromTimeSpan timespan =
+    case timespan of
+        Month ->
+            "Month"
+
+        Week ->
+            "Week"
+
+        Day ->
+            "Day"
+
+        Agenda ->
+            "Agenda"
+
+
 type Msg
-    = ChangeTimespan String
-    | PageBack
+    = PageBack
     | PageForward
+    | ChangeTimeSpan TimeSpan
 
 
 update msg state =
     case msg of
-        ChangeTimespan newTimespan ->
-            state
-                |> changeTimespan newTimespan
-
         PageBack ->
             state
                 |> page -1
@@ -67,6 +77,10 @@ update msg state =
         PageForward ->
             state
                 |> page 1
+
+        ChangeTimeSpan timespan ->
+            state
+                |> changeTimespan timespan
 
 
 page : Int -> State -> State
@@ -86,16 +100,42 @@ page step state =
                 state
 
 
-changeTimespan timespan model =
-    { model | timespan = timespan }
+changeTimespan timespan state =
+    { state | timespan = fromTimeSpan timespan }
 
 
 view : State -> Html Msg
 view state =
-    div [ styleCalendar ]
-        [ viewToolbar state
-        , viewMonth state
-        ]
+    let
+        calendarView =
+            case toTimeSpan state.timespan of
+                Month ->
+                    viewMonth state
+
+                Week ->
+                    viewWeek state (dayRangeOfWeek state.viewing)
+
+                _ ->
+                    viewMonth state
+    in
+        div [ styleCalendar ]
+            [ viewToolbar state
+            , calendarView
+            ]
+
+
+dayRangeOfWeek date =
+    let
+        weekdayNumber =
+            Date.Extra.weekdayNumber date
+
+        begOfWeek =
+            Date.Extra.add Date.Extra.Day (-1 * weekdayNumber) date
+
+        endOfWeek =
+            Date.Extra.add Date.Extra.Day (7 - weekdayNumber) date
+    in
+        Date.Extra.range Date.Extra.Day 1 begOfWeek endOfWeek
 
 
 viewToolbar state =
@@ -145,10 +185,10 @@ viewPagination state =
 
 viewTimespanSelection state =
     div []
-        [ button [ styleButton ] [ text "Month" ]
-        , button [ styleButton ] [ text "Week" ]
-        , button [ styleButton ] [ text "Day" ]
-        , button [ styleButton ] [ text "Agenda" ]
+        [ button [ styleButton, onClick (ChangeTimeSpan Month) ] [ text "Month" ]
+        , button [ styleButton, onClick (ChangeTimeSpan Week) ] [ text "Week" ]
+        , button [ styleButton, onClick (ChangeTimeSpan Day) ] [ text "Day" ]
+        , button [ styleButton, onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
         ]
 
 
@@ -247,4 +287,112 @@ styleCell =
         , ( "padding", "10px" )
         , ( "width", "120px" )
         , ( "height", "100px" )
+        ]
+
+
+intToHourString : Int -> String
+intToHourString int =
+    let
+        ending =
+            if int < 12 then
+                ":00 AM"
+            else
+                ":00 PM"
+
+        hour =
+            if int == 0 || int == 12 then
+                "12"
+            else if int < 12 then
+                toString int
+            else
+                toString <| int - 12
+    in
+        hour ++ ending
+
+
+viewWeek state days =
+    div [ styleWeek ]
+        [ viewWeekContent days ]
+
+
+viewWeekContent days =
+    let
+        styleDay =
+            style
+                [ ( "display", "flex" )
+                , ( "flex-direction", "column" )
+                ]
+
+        viewDay day =
+            div [ styleDay ]
+                [ viewDaySlot day
+                ]
+
+        hours =
+            List.repeat 24 0
+                |> List.indexedMap (\index _ -> intToHourString index)
+
+        viewTimeGutter =
+            hours
+                |> List.map viewTimeSlotGroup
+                |> div [ styleTimeGutter ]
+
+        viewTimeSlotGroup hourString =
+            div [ styleTimeSlotGroup ]
+                [ viewTimeSlot <| hourString
+                , div [ style [ ( "flex", "1 0 0" ) ] ] []
+                ]
+
+        viewTimeSlot hourString =
+            div [ style [ ( "padding", "0 5px" ), ( "flex", "1 0 0" ) ] ]
+                [ span [ style [ ( "font-size", "14px" ) ] ] [ text hourString ] ]
+
+        viewDaySlot day =
+            hours
+                |> List.map viewDaySlotGroup
+                |> div [ styleDay ]
+
+        viewDaySlotGroup hourString =
+            div [ styleColumn ]
+                [ div [ style [ ( "flex", "1 0 0" ) ] ] []
+                , div [ style [ ( "flex", "1 0 0" ) ] ] []
+                ]
+    in
+        div [ styleWeekContent ]
+            ([ viewTimeGutter ] ++ (List.map viewDay days))
+
+
+styleTimeGutter =
+    style [ ( "width", "70px" ) ]
+
+
+styleTimeSlotGroup =
+    style
+        [ ( "border-bottom", "1px solid #DDD" )
+        , ( "min-height", "40px" )
+        , ( "display", "flex" )
+        , ( "flex-flow", "column nowrap" )
+        ]
+
+
+styleColumn =
+    style [ ( "display", "flex" ), ( "flex-direction", "column" ) ]
+
+
+styleWeek =
+    style
+        [ ( "display", "flex" )
+        , ( "width", "1000px" )
+        , ( "border", "1px solid #DDD" )
+        , ( "min-height", "0px" )
+        ]
+
+
+styleWeekContent =
+    style
+        [ ( "display", "flex" )
+        , ( "width", "100%" )
+        , ( "border-top", "2px solid #DDD" )
+        , ( "height", "600px" )
+        , ( "overflow-y", "auto" )
         ]
