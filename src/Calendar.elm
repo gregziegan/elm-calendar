@@ -5,6 +5,7 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
+import DefaultStyles exposing (..)
 
 
 type alias State =
@@ -146,21 +147,6 @@ viewToolbar state =
         ]
 
 
-styleToolbar =
-    style
-        [ ( "display", "flex" )
-        , ( "justify-content", "space-between" )
-        , ( "width", "1000px" )
-        ]
-
-
-styleCalendar =
-    style
-        [ ( "display", "flex" )
-        , ( "flex-direction", "column" )
-        ]
-
-
 viewTitle { viewing } =
     let
         month =
@@ -189,14 +175,6 @@ viewTimespanSelection state =
         , button [ styleButton, onClick (ChangeTimeSpan Week) ] [ text "Week" ]
         , button [ styleButton, onClick (ChangeTimeSpan Day) ] [ text "Day" ]
         , button [ styleButton, onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
-        ]
-
-
-styleButton =
-    style
-        [ ( "border", "1px solid #ccc" )
-        , ( "padding", "5px" )
-        , ( "background-color", "white" )
         ]
 
 
@@ -267,30 +245,10 @@ viewMonth state =
             (List.map viewWeek weeks)
 
 
-styleMonth : Html.Attribute Msg
-styleMonth =
-    style
-        [ ( "display", "flex" )
-        , ( "flex-direction", "column" )
-        , ( "width", "1200px" )
-        , ( "height", "800px" )
-        ]
-
-
 viewCell : State -> Date -> Html Msg
 viewCell state date =
     div [ styleCell ]
         [ text <| toString <| Date.day date ]
-
-
-styleCell : Html.Attribute Msg
-styleCell =
-    style
-        [ ( "border", "2px solid #ccc" )
-        , ( "padding", "10px" )
-        , ( "width", "120px" )
-        , ( "height", "100px" )
-        ]
 
 
 intToHourString : Int -> String
@@ -363,39 +321,3 @@ viewWeekContent days =
     in
         div [ styleWeekContent ]
             ([ viewTimeGutter ] ++ (List.map viewDay days))
-
-
-styleTimeGutter =
-    style [ ( "width", "70px" ) ]
-
-
-styleTimeSlotGroup =
-    style
-        [ ( "border-bottom", "1px solid #DDD" )
-        , ( "min-height", "40px" )
-        , ( "display", "flex" )
-        , ( "flex-flow", "column nowrap" )
-        ]
-
-
-styleColumn =
-    style [ ( "display", "flex" ), ( "flex-direction", "column" ) ]
-
-
-styleWeek =
-    style
-        [ ( "display", "flex" )
-        , ( "width", "1000px" )
-        , ( "border", "1px solid #DDD" )
-        , ( "min-height", "0px" )
-        ]
-
-
-styleWeekContent =
-    style
-        [ ( "display", "flex" )
-        , ( "width", "100%" )
-        , ( "border-top", "2px solid #DDD" )
-        , ( "height", "600px" )
-        , ( "overflow-y", "auto" )
-        ]
