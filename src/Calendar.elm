@@ -119,7 +119,10 @@ view state =
                 Week ->
                     viewWeek state (dayRangeOfWeek state.viewing)
 
-                _ ->
+                Day ->
+                    viewDay state.viewing
+
+                Agenda ->
                     viewMonth state
     in
         div [ styleCalendar ]
@@ -285,20 +288,22 @@ viewWeekHeader days =
         ]
 
 
-viewDates days =
+viewDate day =
     let
-        viewTimeGutterHeader =
-            div [ style [ ( "min-width", "70px" ) ] ] []
-
         title day =
             (toString <| Date.dayOfWeek day) ++ " " ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
-
-        viewDate day =
-            div [ styleDateHeader ]
-                [ a [ styleDate, href "#" ] [ text <| title day ] ]
     in
-        div [ styleDates ]
-            (viewTimeGutterHeader :: List.map viewDate days)
+        div [ styleDateHeader ]
+            [ a [ styleDate, href "#" ] [ text <| title day ] ]
+
+
+viewTimeGutterHeader =
+    div [ style [ ( "min-width", "70px" ) ] ] []
+
+
+viewDates days =
+    div [ styleDates ]
+        (viewTimeGutterHeader :: List.map viewDate days)
 
 
 viewAllDayCell days =
@@ -315,47 +320,64 @@ viewAllDayCell days =
 
 
 viewWeekContent days =
-    let
-        styleDay =
-            style
-                [ ( "display", "flex" )
-                , ( "flex-direction", "column" )
-                ]
+    div [ styleWeekContent ]
+        ([ viewTimeGutter ] ++ (List.map viewWeekDay days))
 
-        viewDay day =
-            div [ styleDay ]
-                [ viewDaySlot day
-                ]
 
-        hours =
-            List.repeat 24 0
-                |> List.indexedMap (\index _ -> intToHourString index)
+hours =
+    List.repeat 24 0
+        |> List.indexedMap (\index _ -> intToHourString index)
 
-        viewTimeGutter =
-            hours
-                |> List.map viewTimeSlotGroup
-                |> div [ styleTimeGutter ]
 
-        viewTimeSlotGroup hourString =
-            div [ styleTimeSlotGroup ]
-                [ viewTimeSlot <| hourString
-                , div [ style [ ( "flex", "1 0 0" ) ] ] []
-                ]
+viewTimeGutter =
+    hours
+        |> List.map viewTimeSlotGroup
+        |> div [ styleTimeGutter ]
 
-        viewTimeSlot hourString =
-            div [ style [ ( "padding", "0 5px" ), ( "flex", "1 0 0" ) ] ]
-                [ span [ style [ ( "font-size", "14px" ) ] ] [ text hourString ] ]
 
-        viewDaySlot day =
-            hours
-                |> List.map viewDaySlotGroup
-                |> div [ styleDaySlot ]
+viewTimeSlotGroup hourString =
+    div [ styleTimeSlotGroup ]
+        [ viewTimeSlot <| hourString
+        , div [ style [ ( "flex", "1 0 0" ) ] ] []
+        ]
 
-        viewDaySlotGroup hourString =
-            div [ styleTimeSlotGroup ]
-                [ div [ style [ ( "flex", "1 0 0" ) ] ] []
-                , div [ style [ ( "flex", "1 0 0" ) ] ] []
-                ]
-    in
-        div [ styleWeekContent ]
-            ([ viewTimeGutter ] ++ (List.map viewDay days))
+
+viewTimeSlot hourString =
+    div [ style [ ( "padding", "0 5px" ), ( "flex", "1 0 0" ) ] ]
+        [ span [ style [ ( "font-size", "14px" ) ] ] [ text hourString ] ]
+
+
+viewDaySlot day =
+    hours
+        |> List.map viewDaySlotGroup
+        |> div [ styleDaySlot ]
+
+
+viewDaySlotGroup hourString =
+    div [ styleTimeSlotGroup ]
+        [ div [ style [ ( "flex", "1 0 0" ) ] ] []
+        , div [ style [ ( "flex", "1 0 0" ) ] ] []
+        ]
+
+
+viewWeekDay day =
+    div [ styleDay ]
+        [ viewDaySlot day
+        ]
+
+
+viewDay day =
+    div [ styleDay ]
+        [ viewDayHeader day
+        , div [ style [ ( "display", "flex" ) ] ]
+            [ viewTimeGutter
+            , viewDaySlot day
+            ]
+        ]
+
+
+viewDayHeader day =
+    div []
+        [ viewTimeGutterHeader
+        , viewDate day
+        ]

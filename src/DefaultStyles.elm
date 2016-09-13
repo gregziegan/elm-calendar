@@ -134,3 +134,10 @@ styleDaySlot =
         [ ( "border-bottom", "1px solid #f7f7f7" )
         , ( "width", "120px" )
         ]
+
+
+styleDay =
+    style
+        [ ( "display", "flex" )
+        , ( "flex-direction", "column" )
+        ]
