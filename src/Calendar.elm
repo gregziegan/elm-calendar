@@ -94,14 +94,14 @@ page step state =
             toTimeSpan timespan
     in
         case timespanType of
-            Month ->
-                { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
-
             Week ->
                 { state | viewing = Date.Extra.add Date.Extra.Week step viewing }
 
+            Day ->
+                { state | viewing = Date.Extra.add Date.Extra.Day step viewing }
+
             _ ->
-                state
+                { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
 
 
 changeTimespan timespan state =
