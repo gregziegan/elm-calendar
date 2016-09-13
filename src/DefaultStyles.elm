@@ -123,7 +123,6 @@ styleAllDayCell =
 
 styleDaySlot =
     style
-        [ ( "border-top", "1px solid #f7f7f7" )
+        [ ( "border-bottom", "1px solid #f7f7f7" )
         , ( "width", "120px" )
-        , ( "min-height", "20px" )
         ]
