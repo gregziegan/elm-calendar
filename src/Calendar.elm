@@ -127,16 +127,13 @@ view state =
 
 dayRangeOfWeek date =
     let
-        weekdayNumber =
-            Date.Extra.weekdayNumber date
-
-        begOfWeek =
-            Date.Extra.add Date.Extra.Day (-1 * weekdayNumber) date
-
-        endOfWeek =
-            Date.Extra.add Date.Extra.Day (7 - weekdayNumber) date
+        firstOfWeek =
+            Date.Extra.floor Date.Extra.Week date
     in
-        Date.Extra.range Date.Extra.Day 1 begOfWeek endOfWeek
+        Date.Extra.range Date.Extra.Day
+            1
+            (Date.Extra.floor Date.Extra.Sunday firstOfWeek)
+            (Date.Extra.ceiling Date.Extra.Sunday firstOfWeek)
 
 
 viewToolbar state =
@@ -288,10 +285,10 @@ viewWeekHeader days =
 viewDates days =
     let
         viewTimeGutterHeader =
-            div [ style [ ( "width", "70px" ) ] ] []
+            div [ style [ ( "min-width", "70px" ) ] ] []
 
         title day =
-            (toString <| Date.dayOfWeek day) ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
+            (toString <| Date.dayOfWeek day) ++ " " ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
 
         viewDate day =
             div [ styleDateHeader ]
@@ -304,7 +301,7 @@ viewDates days =
 viewAllDayCell days =
     let
         viewAllDayText =
-            div [ style [ ( "width", "70px" ) ] ] [ text "All day" ]
+            div [ style [ ( "min-width", "70px" ), ( "padding", "0 5px" ) ] ] [ text "All day" ]
 
         viewAllDay day =
             div [ styleAllDay ]

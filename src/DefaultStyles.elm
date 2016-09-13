@@ -8,7 +8,7 @@ styleToolbar =
     style
         [ ( "display", "flex" )
         , ( "justify-content", "space-between" )
-        , ( "width", "1000px" )
+        , ( "width", "924px" )
         ]
 
 
@@ -28,7 +28,7 @@ styleButton =
 
 
 styleTimeGutter =
-    style [ ( "width", "70px" ) ]
+    style [ ( "min-width", "70px" ) ]
 
 
 styleTimeSlotGroup =
@@ -37,6 +37,8 @@ styleTimeSlotGroup =
         , ( "min-height", "40px" )
         , ( "display", "flex" )
         , ( "flex-flow", "column nowrap" )
+        , ( "min-width", "70px" )
+        , ( "border-left", "1px solid #d7d7d7" )
         ]
 
 
@@ -48,7 +50,7 @@ styleWeek =
     style
         [ ( "display", "flex" )
         , ( "flex-flow", "column nowrap" )
-        , ( "width", "1000px" )
+        , ( "width", "924px" )
         , ( "border", "1px solid #DDD" )
         , ( "min-height", "0px" )
         ]
@@ -57,7 +59,6 @@ styleWeek =
 styleWeekContent =
     style
         [ ( "display", "flex" )
-        , ( "width", "100%" )
         , ( "border-top", "2px solid #DDD" )
         , ( "height", "600px" )
         , ( "overflow-y", "auto" )
@@ -90,12 +91,20 @@ styleWeekHeader =
 
 
 styleDates =
-    style [ ( "display", "flex" ) ]
+    style
+        [ ( "display", "flex" )
+        , ( "border-bottom", "1px solid #f7f7f7" )
+        , ( "flex-flow", "row nowrap" )
+        , ( "align-content", "stretch" )
+        ]
 
 
 styleDateHeader =
     style
-        [ ( "padding", "10px" )
+        [ ( "padding", "0 5px" )
+        , ( "text-align", "center" )
+        , ( "min-width", "109px" )
+        , ( "border-left", "1px solid #f7f7f7" )
         ]
 
 
@@ -117,7 +126,6 @@ styleAllDayCell =
     style
         [ ( "display", "flex" )
         , ( "flex-flow", "nowrap" )
-        , ( "width", "100%" )
         ]
 
 
