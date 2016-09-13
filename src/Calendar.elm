@@ -97,6 +97,9 @@ page step state =
             Month ->
                 { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
 
+            Week ->
+                { state | viewing = Date.Extra.add Date.Extra.Week step viewing }
+
             _ ->
                 state
 
