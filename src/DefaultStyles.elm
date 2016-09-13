@@ -47,6 +47,7 @@ styleColumn =
 styleWeek =
     style
         [ ( "display", "flex" )
+        , ( "flex-flow", "column nowrap" )
         , ( "width", "1000px" )
         , ( "border", "1px solid #DDD" )
         , ( "min-height", "0px" )
@@ -78,4 +79,51 @@ styleCell =
         , ( "padding", "10px" )
         , ( "width", "120px" )
         , ( "height", "100px" )
+        ]
+
+
+styleWeekHeader =
+    style
+        [ ( "display", "flex" )
+        , ( "flex-direction", "column" )
+        ]
+
+
+styleDates =
+    style [ ( "display", "flex" ) ]
+
+
+styleDateHeader =
+    style
+        [ ( "padding", "10px" )
+        ]
+
+
+styleDate =
+    style
+        [ ( "color", "black" )
+        , ( "text-decoration", "none" )
+        ]
+
+
+styleAllDay =
+    style
+        [ ( "width", "120px" )
+        , ( "height", "48px" )
+        ]
+
+
+styleAllDayCell =
+    style
+        [ ( "display", "flex" )
+        , ( "flex-flow", "nowrap" )
+        , ( "width", "100%" )
+        ]
+
+
+styleDaySlot =
+    style
+        [ ( "border-top", "1px solid #f7f7f7" )
+        , ( "width", "120px" )
+        , ( "min-height", "20px" )
         ]

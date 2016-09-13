@@ -273,7 +273,45 @@ intToHourString int =
 
 viewWeek state days =
     div [ styleWeek ]
-        [ viewWeekContent days ]
+        [ viewWeekHeader days
+        , viewWeekContent days
+        ]
+
+
+viewWeekHeader days =
+    div [ styleWeekHeader ]
+        [ viewDates days
+        , viewAllDayCell days
+        ]
+
+
+viewDates days =
+    let
+        viewTimeGutterHeader =
+            div [ style [ ( "width", "70px" ) ] ] []
+
+        title day =
+            (toString <| Date.dayOfWeek day) ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
+
+        viewDate day =
+            div [ styleDateHeader ]
+                [ a [ styleDate, href "#" ] [ text <| title day ] ]
+    in
+        div [ styleDates ]
+            (viewTimeGutterHeader :: List.map viewDate days)
+
+
+viewAllDayCell days =
+    let
+        viewAllDayText =
+            div [ style [ ( "width", "70px" ) ] ] [ text "All day" ]
+
+        viewAllDay day =
+            div [ styleAllDay ]
+                []
+    in
+        div [ styleAllDayCell ]
+            (viewAllDayText :: List.map viewAllDay days)
 
 
 viewWeekContent days =
@@ -311,10 +349,10 @@ viewWeekContent days =
         viewDaySlot day =
             hours
                 |> List.map viewDaySlotGroup
-                |> div [ styleDay ]
+                |> div [ styleDaySlot ]
 
         viewDaySlotGroup hourString =
-            div [ styleColumn ]
+            div [ styleTimeSlotGroup ]
                 [ div [ style [ ( "flex", "1 0 0" ) ] ] []
                 , div [ style [ ( "flex", "1 0 0" ) ] ] []
                 ]
