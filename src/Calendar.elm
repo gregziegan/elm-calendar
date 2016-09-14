@@ -417,7 +417,11 @@ eventsGroupedByDate events =
                             initEventGroup event :: eventGroups
     in
         List.sortBy (.start >> Date.toTime) events
-            |> List.foldl buildEventGroup []
+            |>
+                List.reverse
+            -- TODO: fix sort by ordering
+            |>
+                List.foldl buildEventGroup []
 
 
 
@@ -439,10 +443,23 @@ viewAgenda date =
 
 
 viewAgendaDay eventGroup =
-    div []
-        [ text <| toString eventGroup.date
-        , viewAgendaTimes eventGroup.events
-        ]
+    let
+        day =
+            Date.dayOfWeek eventGroup.date |> toString
+
+        month =
+            Date.month eventGroup.date |> toString
+
+        date =
+            Date.day eventGroup.date |> toString
+
+        dateString =
+            day ++ " " ++ month ++ " " ++ date
+    in
+        div []
+            [ text <| dateString
+            , viewAgendaTimes <| Debug.log "eventGroup events" eventGroup.events
+            ]
 
 
 viewAgendaTimes events =
@@ -453,12 +470,10 @@ viewAgendaTimes events =
 viewEventAndTime event =
     let
         startTime =
-            Date.toTime event.start
-                |> toString
+            Date.Extra.toFormattedString "h:mm a" event.start
 
         endTime =
-            Date.toTime event.end
-                |> toString
+            Date.Extra.toFormattedString "h:mm a" event.end
 
         timeRange =
             startTime ++ " - " ++ endTime
@@ -480,5 +495,5 @@ someUnixTime =
 events =
     [ { id = "brunch1", title = "Brunch w/ Friends", start = Date.fromTime someUnixTime, end = Date.fromTime <| (someUnixTime + 2 * Time.hour) }
     , { id = "brunch2", title = "Brunch w/o Friends :(", start = Date.fromTime <| someUnixTime + (24 * Time.hour), end = Date.fromTime <| someUnixTime + (25 * Time.hour) }
-    , { id = "conference", title = "Strangeloop", start = Date.fromTime <| someUnixTime + (200 * Time.hour), end = Date.fromTime <| someUnixTime + (248 * Time.hour) }
+    , { id = "conference", title = "Strangeloop", start = Date.fromTime <| someUnixTime + (200 * Time.hour), end = Date.fromTime <| someUnixTime + (258 * Time.hour) }
     ]
