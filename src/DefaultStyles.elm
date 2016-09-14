@@ -43,7 +43,10 @@ styleTimeSlotGroup =
 
 
 styleColumn =
-    style [ ( "display", "flex" ), ( "flex-direction", "column" ) ]
+    style
+        [ ( "display", "flex" )
+        , ( "flex-direction", "column" )
+        ]
 
 
 styleWeek =
@@ -140,4 +143,46 @@ styleDay =
     style
         [ ( "display", "flex" )
         , ( "flex-direction", "column" )
+        ]
+
+
+styleAgenda =
+    style
+        [ ( "display", "flex" )
+        , ( "flex-flow", "column nowrap" )
+        , ( "width", "924px" )
+        , ( "border", "1px solid #DDD" )
+        , ( "min-height", "0px" )
+        ]
+
+
+styleAgendaHeader =
+    style
+        [ ( "display", "flex" )
+        , ( "border-bottom", "1px solid #DDD" )
+        ]
+
+
+styleHeaderCell =
+    style
+        [ ( "text-align", "center" )
+        , ( "border-left", "1px solid #DDD" )
+        ]
+
+
+styleAgendaDay =
+    style
+        [ ( "display", "flex" )
+        , ( "border-bottom", "1px solid #d7d7d7" )
+        ]
+
+
+styleAgendaDateCell =
+    style [ ( "padding", "0 5px" ) ]
+
+
+styleAgendaCell =
+    style
+        [ ( "padding", "0 5px" )
+        , ( "border-left", "1px solid #DDD" )
         ]

@@ -434,12 +434,20 @@ viewAgenda date =
         groupedEvents =
             eventsGroupedByDate events
     in
-        div []
-            (List.map viewAgendaDay groupedEvents)
+        div [ styleAgenda ]
+            (viewAgendaHeader :: List.map viewAgendaDay groupedEvents)
 
 
 
 -- Date | Time | Event
+
+
+viewAgendaHeader =
+    div [ styleAgendaHeader ]
+        [ div [ styleHeaderCell ] [ text "Date" ]
+        , div [ styleHeaderCell ] [ text "Time" ]
+        , div [ styleHeaderCell ] [ text "Event" ]
+        ]
 
 
 viewAgendaDay eventGroup =
@@ -456,8 +464,8 @@ viewAgendaDay eventGroup =
         dateString =
             day ++ " " ++ month ++ " " ++ date
     in
-        div []
-            [ text <| dateString
+        div [ styleAgendaDay ]
+            [ div [ styleAgendaDateCell ] [ text <| dateString ]
             , viewAgendaTimes <| Debug.log "eventGroup events" eventGroup.events
             ]
 
@@ -479,8 +487,8 @@ viewEventAndTime event =
             startTime ++ " - " ++ endTime
     in
         div [ style [ ( "display", "flex" ) ] ]
-            [ div [] [ text timeRange ]
-            , div [] [ text event.title ]
+            [ div [ styleAgendaCell ] [ text timeRange ]
+            , div [ styleAgendaCell ] [ text event.title ]
             ]
 
 
