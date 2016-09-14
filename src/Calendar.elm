@@ -455,17 +455,8 @@ viewAgendaHeader =
 
 viewAgendaDay eventGroup =
     let
-        day =
-            Date.dayOfWeek eventGroup.date |> toString
-
-        month =
-            Date.month eventGroup.date |> toString
-
-        date =
-            Date.day eventGroup.date |> toString
-
         dateString =
-            day ++ " " ++ month ++ " " ++ date
+            Date.Extra.toFormattedString "EE MM d" eventGroup.date
     in
         div [ styleAgendaDay ]
             [ div [ styleAgendaDateCell ] [ text <| dateString ]
