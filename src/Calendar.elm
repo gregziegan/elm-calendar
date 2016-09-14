@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import DefaultStyles exposing (..)
+import Time
 
 
 type alias State =
@@ -123,7 +124,7 @@ view state =
                     viewDay state.viewing
 
                 Agenda ->
-                    viewMonth state
+                    viewAgenda state.viewing
     in
         div [ styleCalendar ]
             [ viewToolbar state
@@ -381,3 +382,103 @@ viewDayHeader day =
         [ viewTimeGutterHeader
         , viewDate day
         ]
+
+
+
+-- type alias EventGroup =
+--   { date : Date
+--   , events : List Event
+--   }
+
+
+eventsGroupedByDate events =
+    let
+        initEventGroup event =
+            { date = event.start, events = [ event ] }
+
+        buildEventGroup event eventGroups =
+            let
+                restOfEventGroups groups =
+                    case List.tail groups of
+                        Nothing ->
+                            Debug.crash "There should never be Nothing for this list."
+
+                        Just restOfGroups ->
+                            restOfGroups
+            in
+                case List.head eventGroups of
+                    Nothing ->
+                        [ initEventGroup event ]
+
+                    Just eventGroup ->
+                        if Date.Extra.isBetween event.start eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date) then
+                            { eventGroup | events = event :: eventGroup.events } :: (restOfEventGroups eventGroups)
+                        else
+                            initEventGroup event :: eventGroups
+    in
+        List.sortBy (.start >> Date.toTime) events
+            |> List.foldl buildEventGroup []
+
+
+
+-- look at each event
+-- build
+
+
+viewAgenda date =
+    let
+        groupedEvents =
+            eventsGroupedByDate events
+    in
+        div []
+            (List.map viewAgendaDay groupedEvents)
+
+
+
+-- Date | Time | Event
+
+
+viewAgendaDay eventGroup =
+    div []
+        [ text <| toString eventGroup.date
+        , viewAgendaTimes eventGroup.events
+        ]
+
+
+viewAgendaTimes events =
+    div []
+        (List.map viewEventAndTime events)
+
+
+viewEventAndTime event =
+    let
+        startTime =
+            Date.toTime event.start
+                |> toString
+
+        endTime =
+            Date.toTime event.end
+                |> toString
+
+        timeRange =
+            startTime ++ " - " ++ endTime
+    in
+        div [ style [ ( "display", "flex" ) ] ]
+            [ div [] [ text timeRange ]
+            , div [] [ text event.title ]
+            ]
+
+
+
+-- I don't have internet rt now
+
+
+someUnixTime =
+    1473652025106
+
+
+events =
+    [ { id = "brunch1", title = "Brunch w/ Friends", start = Date.fromTime someUnixTime, end = Date.fromTime <| (someUnixTime + 2 * Time.hour) }
+    , { id = "brunch2", title = "Brunch w/o Friends :(", start = Date.fromTime <| someUnixTime + (24 * Time.hour), end = Date.fromTime <| someUnixTime + (25 * Time.hour) }
+    , { id = "conference", title = "Strangeloop", start = Date.fromTime <| someUnixTime + (200 * Time.hour), end = Date.fromTime <| someUnixTime + (248 * Time.hour) }
+    ]
