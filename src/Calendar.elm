@@ -185,9 +185,6 @@ viewTimespanSelection state =
 getMonthRange : Date -> List (List Date)
 getMonthRange date =
     let
-        curMonth =
-            Date.month date
-
         begMonth =
             Date.Extra.floor Date.Extra.Month date
 
@@ -411,12 +408,12 @@ eventsGroupedByDate events =
                         [ initEventGroup event ]
 
                     Just eventGroup ->
-                        if Date.Extra.isBetween event.start eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date) then
+                        if Date.Extra.isBetween eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date) event.start then
                             { eventGroup | events = event :: eventGroup.events } :: (restOfEventGroups eventGroups)
                         else
                             initEventGroup event :: eventGroups
     in
-        List.sortBy (.start >> Date.toTime) events
+        List.sortBy (Date.toTime << .start) events
             |>
                 List.reverse
             -- TODO: fix sort by ordering
@@ -433,9 +430,15 @@ viewAgenda date =
     let
         groupedEvents =
             eventsGroupedByDate events
+
+        isDateInMonth eventsDate =
+            Date.Extra.isBetween (Date.Extra.floor Date.Extra.Month date) (Date.Extra.ceiling Date.Extra.Month date) eventsDate
+
+        filteredEventsByMonth =
+            List.filter (isDateInMonth << .date) groupedEvents
     in
         div [ styleAgenda ]
-            (viewAgendaHeader :: List.map viewAgendaDay groupedEvents)
+            (viewAgendaHeader :: List.map viewAgendaDay filteredEventsByMonth)
 
 
 
@@ -466,7 +469,7 @@ viewAgendaDay eventGroup =
     in
         div [ styleAgendaDay ]
             [ div [ styleAgendaDateCell ] [ text <| dateString ]
-            , viewAgendaTimes <| Debug.log "eventGroup events" eventGroup.events
+            , viewAgendaTimes eventGroup.events
             ]
 
 
