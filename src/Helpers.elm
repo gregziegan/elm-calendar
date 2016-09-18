@@ -1,12 +1,15 @@
 module Helpers exposing (..)
 
+import Date exposing (Date)
 import Date.Extra
 
 
+hourString : Date -> String
 hourString date =
     Date.Extra.toFormattedString "h:mm a" date
 
 
+hours : Date -> List Date
 hours date =
     let
         midnight =
@@ -16,35 +19,6 @@ hours date =
             Date.Extra.ceiling Date.Extra.Day date
     in
         Date.Extra.range Date.Extra.Hour 1 midnight lastHour
-
-
-eventsGroupedByDate events =
-    let
-        initEventGroup event =
-            { date = event.start, events = [ event ] }
-
-        buildEventGroup event eventGroups =
-            let
-                restOfEventGroups groups =
-                    case List.tail groups of
-                        Nothing ->
-                            Debug.crash "There should never be Nothing for this list."
-
-                        Just restOfGroups ->
-                            restOfGroups
-            in
-                case List.head eventGroups of
-                    Nothing ->
-                        [ initEventGroup event ]
-
-                    Just eventGroup ->
-                        if Date.Extra.isBetween eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date) event.start then
-                            { eventGroup | events = event :: eventGroup.events } :: (restOfEventGroups eventGroups)
-                        else
-                            initEventGroup event :: eventGroups
-    in
-        List.sortBy (Date.toTime << .start) events
-            |> List.foldr buildEventGroup []
 
 
 getMonthRange : Date -> List (List Date)
@@ -101,3 +75,45 @@ dayRangeOfWeek date =
             1
             (Date.Extra.floor Date.Extra.Sunday firstOfWeek)
             (Date.Extra.ceiling Date.Extra.Sunday firstOfWeek)
+
+
+type TimeSpan
+    = Month
+    | Week
+    | Day
+    | Agenda
+
+
+toTimeSpan : String -> TimeSpan
+toTimeSpan timespan =
+    case timespan of
+        "Month" ->
+            Month
+
+        "Week" ->
+            Week
+
+        "Day" ->
+            Day
+
+        "Agenda" ->
+            Agenda
+
+        _ ->
+            Month
+
+
+fromTimeSpan : TimeSpan -> String
+fromTimeSpan timespan =
+    case timespan of
+        Month ->
+            "Month"
+
+        Week ->
+            "Week"
+
+        Day ->
+            "Day"
+
+        Agenda ->
+            "Agenda"

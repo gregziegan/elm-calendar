@@ -1,26 +1,26 @@
 module Calendar.Month exposing (..)
 
+import Html exposing (..)
+import Date exposing (Date)
+import DefaultStyles exposing (..)
+import Helpers
 
-viewMonth : State -> Html Msg
-viewMonth state =
+
+view : Date -> Html msg
+view viewing =
     let
         weeks =
-            getMonthRange state.viewing
-
-        styleWeek =
-            style
-                [ ( "display", "flex" )
-                ]
+            Helpers.getMonthRange viewing
 
         viewWeek week =
-            div [ styleWeek ]
-                (List.map (viewCell state) week)
+            div [ styleMonthWeek ]
+                (List.map (viewCell viewing) week)
     in
         div [ styleMonth ]
             (List.map viewWeek weeks)
 
 
-viewCell : State -> Date -> Html Msg
-viewCell state date =
+viewCell : Date -> Date -> Html msg
+viewCell viewing date =
     div [ styleCell ]
         [ text <| toString <| Date.day date ]

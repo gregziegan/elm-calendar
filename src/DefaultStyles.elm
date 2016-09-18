@@ -19,6 +19,12 @@ styleCalendar =
         ]
 
 
+styleMonthWeek =
+    style
+        [ ( "display", "flex" )
+        ]
+
+
 styleButton =
     style
         [ ( "border", "1px solid #ccc" )

@@ -2,12 +2,15 @@ module Calendar exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (..)
-import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
-import Date.Extra.Facts as DateFacts
 import DefaultStyles exposing (..)
-import Time
+import Calendar.Config exposing (ViewConfig, defaultConfig)
+import Calendar.Agenda as Agenda
+import Calendar.Day as Day
+import Calendar.Month as Month
+import Calendar.Week as Week
+import Helpers exposing (TimeSpan(..))
 
 
 type alias State =
@@ -23,54 +26,13 @@ init timespan viewing =
     }
 
 
-type TimeSpan
-    = Month
-    | Week
-    | Day
-    | Agenda
-
-
-toTimeSpan : String -> TimeSpan
-toTimeSpan timespan =
-    case timespan of
-        "Month" ->
-            Month
-
-        "Week" ->
-            Week
-
-        "Day" ->
-            Day
-
-        "Agenda" ->
-            Agenda
-
-        _ ->
-            Month
-
-
-fromTimeSpan : TimeSpan -> String
-fromTimeSpan timespan =
-    case timespan of
-        Month ->
-            "Month"
-
-        Week ->
-            "Week"
-
-        Day ->
-            "Day"
-
-        Agenda ->
-            "Agenda"
-
-
 type Msg
     = PageBack
     | PageForward
     | ChangeTimeSpan TimeSpan
 
 
+update : Msg -> State -> State
 update msg state =
     case msg of
         PageBack ->
@@ -93,7 +55,7 @@ page step state =
             state
 
         timespanType =
-            toTimeSpan timespan
+            Helpers.toTimeSpan timespan
     in
         case timespanType of
             Week ->
@@ -106,39 +68,69 @@ page step state =
                 { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
 
 
+changeTimespan : Helpers.TimeSpan -> State -> State
 changeTimespan timespan state =
-    { state | timespan = fromTimeSpan timespan }
+    { state | timespan = Helpers.fromTimeSpan timespan }
 
 
-view : State -> Html Msg
-view state =
+view : ViewConfig event -> List event -> State -> Html Msg
+view config events { viewing, timespan } =
     let
+        timespanType =
+            Helpers.toTimeSpan timespan
+
         calendarView =
-            case toTimeSpan state.timespan of
+            case timespanType of
                 Month ->
-                    viewMonth state
+                    Month.view viewing
 
                 Week ->
-                    viewWeek state (dayRangeOfWeek state.viewing)
+                    Week.view viewing
 
                 Day ->
-                    viewDay state.viewing
+                    Day.view viewing
 
                 Agenda ->
-                    viewAgenda state.viewing
+                    Agenda.view config events viewing
     in
         div [ styleCalendar ]
-            [ viewToolbar state
+            [ viewToolbar viewing timespanType
             , calendarView
             ]
 
 
-someUnixTime =
-    1473652025106
+viewToolbar : Date -> TimeSpan -> Html Msg
+viewToolbar viewing timespan =
+    div [ styleToolbar ]
+        [ viewPagination
+        , viewTitle viewing
+        , viewTimespanSelection timespan
+        ]
 
 
-events =
-    [ { id = "brunch1", title = "Brunch w/ Friends", start = Date.fromTime someUnixTime, end = Date.fromTime <| (someUnixTime + 2 * Time.hour) }
-    , { id = "brunch2", title = "Brunch w/o Friends :(", start = Date.fromTime <| someUnixTime + (24 * Time.hour), end = Date.fromTime <| someUnixTime + (25 * Time.hour) }
-    , { id = "conference", title = "Strangeloop", start = Date.fromTime <| someUnixTime + (200 * Time.hour), end = Date.fromTime <| someUnixTime + (258 * Time.hour) }
-    ]
+viewTitle : Date -> Html msg
+viewTitle viewing =
+    let
+        title =
+            Date.Extra.toFormattedString "MMMM y" viewing
+    in
+        div []
+            [ h2 [] [ text title ] ]
+
+
+viewPagination : Html Msg
+viewPagination =
+    div []
+        [ button [ styleButton, onClick PageBack ] [ text "back" ]
+        , button [ styleButton, onClick PageForward ] [ text "next" ]
+        ]
+
+
+viewTimespanSelection : TimeSpan -> Html Msg
+viewTimespanSelection timespan =
+    div []
+        [ button [ styleButton, onClick (ChangeTimeSpan Month) ] [ text "Month" ]
+        , button [ styleButton, onClick (ChangeTimeSpan Week) ] [ text "Week" ]
+        , button [ styleButton, onClick (ChangeTimeSpan Day) ] [ text "Day" ]
+        , button [ styleButton, onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
+        ]
