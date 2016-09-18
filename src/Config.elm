@@ -1,4 +1,4 @@
-module Calendar.Config exposing (..)
+module Config exposing (..)
 
 import Date exposing (Date)
 

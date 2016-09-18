@@ -4,12 +4,13 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
+import Config exposing (ViewConfig)
 import DefaultStyles exposing (..)
 import Helpers
 
 
-view : Date -> Html msg
-view day =
+view : ViewConfig event -> List event -> Date -> Html msg
+view config events day =
     div [ styleDay ]
         [ viewDayHeader day
         , div [ style [ ( "display", "flex" ) ] ]

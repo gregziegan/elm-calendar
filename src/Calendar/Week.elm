@@ -3,12 +3,13 @@ module Calendar.Week exposing (..)
 import Html exposing (..)
 import Date exposing (Date)
 import Calendar.Day exposing (..)
+import Config exposing (ViewConfig)
 import DefaultStyles exposing (..)
 import Helpers
 
 
-viewWeekContent : Date -> List Date -> Html msg
-viewWeekContent viewing days =
+viewWeekContent : ViewConfig event -> List event -> Date -> List Date -> Html msg
+viewWeekContent config events viewing days =
     div [ styleWeekContent ]
         ([ viewTimeGutter viewing ] ++ (List.map viewWeekDay days))
 
@@ -20,15 +21,15 @@ viewWeekDay day =
         ]
 
 
-view : Date -> Html msg
-view viewing =
+view : ViewConfig event -> List event -> Date -> Html msg
+view config events viewing =
     let
         weekRange =
             Helpers.dayRangeOfWeek viewing
     in
         div [ styleWeek ]
             [ viewWeekHeader weekRange
-            , viewWeekContent viewing weekRange
+            , viewWeekContent config events viewing weekRange
             ]
 
 

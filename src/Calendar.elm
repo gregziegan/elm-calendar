@@ -5,7 +5,7 @@ import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import DefaultStyles exposing (..)
-import Calendar.Config exposing (ViewConfig, defaultConfig)
+import Config exposing (ViewConfig, defaultConfig)
 import Calendar.Agenda as Agenda
 import Calendar.Day as Day
 import Calendar.Month as Month
@@ -82,13 +82,13 @@ view config events { viewing, timespan } =
         calendarView =
             case timespanType of
                 Month ->
-                    Month.view viewing
+                    Month.view config events viewing
 
                 Week ->
-                    Week.view viewing
+                    Week.view config events viewing
 
                 Day ->
-                    Day.view viewing
+                    Day.view config events viewing
 
                 Agenda ->
                     Agenda.view config events viewing

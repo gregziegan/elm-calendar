@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import DefaultStyles exposing (..)
 import Helpers
-import Calendar.Config exposing (ViewConfig, defaultConfig)
+import Config exposing (ViewConfig, defaultConfig)
 
 
 type alias EventGroup event =
@@ -26,7 +26,7 @@ eventsGroupedByDate config events =
                 restOfEventGroups groups =
                     case List.tail groups of
                         Nothing ->
-                            Debug.crash "There should never be Nothing for this list."
+                            []
 
                         Just restOfGroups ->
                             restOfGroups
