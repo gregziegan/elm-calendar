@@ -5,6 +5,7 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
+import Date.Extra.Facts as DateFacts
 import DefaultStyles exposing (..)
 import Time
 
@@ -252,30 +253,10 @@ viewCell state date =
         [ text <| toString <| Date.day date ]
 
 
-intToHourString : Int -> String
-intToHourString int =
-    let
-        ending =
-            if int < 12 then
-                ":00 AM"
-            else
-                ":00 PM"
-
-        hour =
-            if int == 0 || int == 12 then
-                "12"
-            else if int < 12 then
-                toString int
-            else
-                toString <| int - 12
-    in
-        hour ++ ending
-
-
 viewWeek state days =
     div [ styleWeek ]
         [ viewWeekHeader days
-        , viewWeekContent days
+        , viewWeekContent state days
         ]
 
 
@@ -317,36 +298,42 @@ viewAllDayCell days =
             (viewAllDayText :: List.map viewAllDay days)
 
 
-viewWeekContent days =
+viewWeekContent { viewing } days =
     div [ styleWeekContent ]
-        ([ viewTimeGutter ] ++ (List.map viewWeekDay days))
+        ([ viewTimeGutter viewing ] ++ (List.map viewWeekDay days))
 
 
-hours =
-    List.repeat 24 0
-        |> List.indexedMap (\index _ -> intToHourString index)
+hours date =
+    let
+        midnight =
+            Date.Extra.floor Date.Extra.Day date
+
+        lastHour =
+            Date.Extra.ceiling Date.Extra.Day date
+    in
+        Date.Extra.range Date.Extra.Hour 1 midnight lastHour
 
 
-viewTimeGutter =
-    hours
+viewTimeGutter date =
+    hours date
         |> List.map viewTimeSlotGroup
         |> div [ styleTimeGutter ]
 
 
-viewTimeSlotGroup hourString =
+viewTimeSlotGroup date =
     div [ styleTimeSlotGroup ]
-        [ viewTimeSlot <| hourString
+        [ viewTimeSlot date
         , div [ style [ ( "flex", "1 0 0" ) ] ] []
         ]
 
 
-viewTimeSlot hourString =
+viewTimeSlot date =
     div [ style [ ( "padding", "0 5px" ), ( "flex", "1 0 0" ) ] ]
-        [ span [ style [ ( "font-size", "14px" ) ] ] [ text hourString ] ]
+        [ span [ style [ ( "font-size", "14px" ) ] ] [ text <| hourString date ] ]
 
 
 viewDaySlot day =
-    hours
+    hours day
         |> List.map viewDaySlotGroup
         |> div [ styleDaySlot ]
 
@@ -368,7 +355,7 @@ viewDay day =
     div [ styleDay ]
         [ viewDayHeader day
         , div [ style [ ( "display", "flex" ) ] ]
-            [ viewTimeGutter
+            [ viewTimeGutter day
             , viewDaySlot day
             ]
         ]
@@ -414,16 +401,7 @@ eventsGroupedByDate events =
                             initEventGroup event :: eventGroups
     in
         List.sortBy (Date.toTime << .start) events
-            |>
-                List.reverse
-            -- TODO: fix sort by ordering
-            |>
-                List.foldl buildEventGroup []
-
-
-
--- look at each event
--- build
+            |> List.foldr buildEventGroup []
 
 
 viewAgenda date =
@@ -469,13 +447,17 @@ viewAgendaTimes events =
         (List.map viewEventAndTime events)
 
 
+hourString date =
+    Date.Extra.toFormattedString "h:mm a" date
+
+
 viewEventAndTime event =
     let
         startTime =
-            Date.Extra.toFormattedString "h:mm a" event.start
+            hourString event.start
 
         endTime =
-            Date.Extra.toFormattedString "h:mm a" event.end
+            hourString event.end
 
         timeRange =
             startTime ++ " - " ++ endTime
@@ -484,10 +466,6 @@ viewEventAndTime event =
             [ div [ styleAgendaCell ] [ text timeRange ]
             , div [ styleAgendaCell ] [ text event.title ]
             ]
-
-
-
--- I don't have internet rt now
 
 
 someUnixTime =
