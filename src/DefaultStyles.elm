@@ -192,3 +192,27 @@ styleAgendaCell =
         [ ( "padding", "0 5px" )
         , ( "border-left", "1px solid #DDD" )
         ]
+
+
+styleMonthEvents =
+    style
+        [ ( "display", "flex" )
+        , ( "flex-flow", "column nowrap" )
+        , ( "justify-content", "space-between" )
+        , ( "height", "75px" )
+        , ( "overflow-y", "hidden" )
+        ]
+
+
+styleMonthEvent =
+    style
+        [ ( "width", "110px" )
+        , ( "padding", "2px 5px" )
+        , ( "border-radius", "5px" )
+        , ( "background-color", "#3174ad" )
+        , ( "text-overflow", "ellipsis" )
+        , ( "white-space", "nowrap" )
+        , ( "overflow", "hidden" )
+        , ( "color", "white" )
+        , ( "cursor", "pointer" )
+        ]
