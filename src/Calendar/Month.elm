@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
+import Date.Extra.Facts
 import DefaultStyles exposing (..)
 import Config exposing (ViewConfig)
 import Helpers
@@ -15,8 +16,26 @@ view config events viewing =
         weeks =
             Helpers.getMonthRange viewing
     in
-        div [ styleMonth ]
-            (List.map (viewMonthRow config events) weeks)
+        div [ styleColumn ]
+            [ viewMonthHeader
+            , div [ styleMonth ]
+                (List.map (viewMonthRow config events) weeks)
+            ]
+
+
+viewMonthHeader : Html msg
+viewMonthHeader =
+    let
+        viewDayOfWeek int =
+            viewDay <| Date.Extra.Facts.dayOfWeekFromWeekdayNumber int
+    in
+        div [ styleRow, style [ ( "width", "1200px" ) ] ] (List.map viewDayOfWeek [1..7])
+
+
+viewDay : Date.Day -> Html msg
+viewDay day =
+    div [ styleMonthDayHeader ]
+        [ a [ styleDate, href "#" ] [ text <| toString day ] ]
 
 
 viewMonthRow : ViewConfig event -> List event -> List Date -> Html msg
@@ -89,13 +108,22 @@ viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (List (Html msg)
 viewWeekEvent config week event =
     let
         cellWidth =
-            120
+            (100.0 / 7)
 
         offsetLength =
-            cellWidth * Date.Extra.weekdayNumber (config.start event)
+            cellWidth * (toFloat <| Date.Extra.weekdayNumber (config.start event))
+
+        offsetPercentage =
+            (toString offsetLength) ++ "%"
 
         offsetSegment =
-            div [ style [ ( "width", toString offsetLength ) ] ] []
+            div
+                [ style
+                    [ ( "flex-basis", offsetPercentage )
+                    , ( "max-width", offsetPercentage )
+                    ]
+                ]
+                []
 
         begWeek =
             Maybe.withDefault (config.start event) <| List.head <| week
@@ -131,22 +159,24 @@ viewWeekEvent config week event =
 
         eventWidth eventWithinWeek =
             cellWidth
-                * case eventWithinWeek of
-                    StartsAndEnds ->
-                        Date.Extra.diff Date.Extra.Day (config.start event) (config.end event) + 1
+                * (toFloat
+                    <| case eventWithinWeek of
+                        StartsAndEnds ->
+                            Date.Extra.diff Date.Extra.Day (config.start event) (config.end event) + 1
 
-                    ContinuesAfter ->
-                        7 - (Date.Extra.weekdayNumber <| config.start event) + 1
+                        ContinuesAfter ->
+                            7 - (Date.Extra.weekdayNumber <| config.start event) + 1
 
-                    ContinuesPrior ->
-                        7 - (Date.Extra.weekdayNumber <| config.end event) + 1
+                        ContinuesPrior ->
+                            7 - (Date.Extra.weekdayNumber <| config.end event) + 1
 
-                    ContinuesAfterAndPrior ->
-                        7
+                        ContinuesAfterAndPrior ->
+                            7
+                  )
 
         eventSegment eventWithinWeek =
             div [ style ([ ( "width", toString <| eventWidth eventWithinWeek ) ] ++ (eventWeekStyles eventWithinWeek)) ]
-                [ text <| config.title event ]
+                [ text <| config.title <| Debug.log "event" event ]
 
         viewEvent eventWithinWeek =
             if offsetLength > 0 then

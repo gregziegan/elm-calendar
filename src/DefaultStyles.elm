@@ -18,6 +18,14 @@ styleCalendar =
         ]
 
 
+styleMonthDayHeader =
+    style
+        [ ( "max-width", cellWidth )
+        , ( "flex-basis", cellWidth )
+        , ( "text-align", "center" )
+        ]
+
+
 styleMonthRow =
     style
         [ ( "display", "flex" )
