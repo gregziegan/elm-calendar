@@ -29,7 +29,7 @@ viewMonthHeader =
         viewDayOfWeek int =
             viewDay <| Date.Extra.Facts.dayOfWeekFromWeekdayNumber int
     in
-        div [ styleRow, style [ ( "width", "1200px" ) ] ] (List.map viewDayOfWeek [1..7])
+        div [ styleRow, style [ ( "width", "1200px" ) ] ] (List.map viewDayOfWeek [0..6])
 
 
 viewDay : Date.Day -> Html msg
@@ -111,19 +111,19 @@ viewWeekEvent config week event =
             (100.0 / 7)
 
         offsetLength =
-            cellWidth * (toFloat <| Date.Extra.weekdayNumber (config.start event))
+            cellWidth * (toFloat <| (Date.Extra.weekdayNumber (config.start event)) % 7)
 
         offsetPercentage =
             (toString offsetLength) ++ "%"
 
-        offsetSegment =
-            div
-                [ style
-                    [ ( "flex-basis", offsetPercentage )
-                    , ( "max-width", offsetPercentage )
-                    ]
+        styleRowSegment widthPercentage =
+            style
+                [ ( "flex-basis", widthPercentage )
+                , ( "max-width", widthPercentage )
                 ]
-                []
+
+        rowSegment widthPercentage children =
+            div [ styleRowSegment widthPercentage ] children
 
         begWeek =
             Maybe.withDefault (config.start event) <| List.head <| week
@@ -174,14 +174,17 @@ viewWeekEvent config week event =
                             7
                   )
 
+        eventWidthPercentage eventWithinWeek =
+            (toString <| eventWidth eventWithinWeek) ++ "%"
+
         eventSegment eventWithinWeek =
-            div [ style ([ ( "width", toString <| eventWidth eventWithinWeek ) ] ++ (eventWeekStyles eventWithinWeek)) ]
-                [ text <| config.title <| Debug.log "event" event ]
+            div [ style (eventWeekStyles eventWithinWeek) ]
+                [ div [ styleMonthEventContent ] [ text <| config.title <| Debug.log "event" event ] ]
 
         viewEvent eventWithinWeek =
             if offsetLength > 0 then
-                [ offsetSegment, eventSegment eventWithinWeek ]
+                [ rowSegment offsetPercentage [], rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment eventWithinWeek ] ]
             else
-                [ eventSegment eventWithinWeek ]
+                [ rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment eventWithinWeek ] ]
     in
         Maybe.map viewEvent maybeEventOnDate

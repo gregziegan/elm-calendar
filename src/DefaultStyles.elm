@@ -257,12 +257,17 @@ styleMonthEvents =
 monthEventsMixin =
     [ ( "padding", "2px 5px" )
     , ( "background-color", "#3174ad" )
-    , ( "text-overflow", "ellipsis" )
-    , ( "white-space", "nowrap" )
-    , ( "overflow", "hidden" )
     , ( "color", "white" )
     , ( "cursor", "pointer" )
     ]
+
+
+styleMonthEventContent =
+    style
+        [ ( "text-overflow", "ellipsis" )
+        , ( "white-space", "nowrap" )
+        , ( "overflow", "hidden" )
+        ]
 
 
 monthEventStartsAndEndsMixin =
