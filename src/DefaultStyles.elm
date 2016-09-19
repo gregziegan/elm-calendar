@@ -1,6 +1,5 @@
 module DefaultStyles exposing (..)
 
-import Html
 import Html.Attributes exposing (style)
 
 
@@ -19,9 +18,50 @@ styleCalendar =
         ]
 
 
-styleMonthWeek =
+styleMonthRow =
     style
         [ ( "display", "flex" )
+        , ( "flex-direction", "column" )
+        , ( "border-top", "1px solid #DDD" )
+        , ( "height", "100%" )
+        , ( "position", "relative" )
+        ]
+
+
+cellWidth =
+    (toString <| 100.0 / 7) ++ "%"
+
+
+styleDateCell =
+    style
+        [ ( "padding-right", "5px" )
+        , ( "text-align", "right" )
+        , ( "flex-basis", cellWidth )
+        , ( "max-width", cellWidth )
+        ]
+
+
+styleMonthRowBackground =
+    style
+        [ ( "display", "flex" )
+        , ( "overflow", "hidden" )
+        , ( "position", "absolute" )
+        , ( "top", "0" )
+        , ( "left", "0" )
+        , ( "right", "0" )
+        , ( "bottom", "0" )
+          -- , ( "height", "100px" )
+        ]
+
+
+styleRow =
+    style [ ( "display", "flex" ) ]
+
+
+styleMonthWeek =
+    style
+        [ ( "position", "relative" )
+        , ( "z-index", "4" )
         ]
 
 
@@ -80,15 +120,17 @@ styleMonth =
         , ( "flex-direction", "column" )
         , ( "width", "1200px" )
         , ( "height", "800px" )
+        , ( "position", "relative" )
+        , ( "border", "1px solid #DDD" )
         ]
 
 
 styleCell =
     style
-        [ ( "border", "2px solid #ccc" )
-        , ( "padding", "10px" )
-        , ( "width", "120px" )
-        , ( "height", "100px" )
+        [ ( "flex-basis", cellWidth )
+        , ( "max-width", cellWidth )
+        , ( "border-left", "1px solid #ddd" )
+          -- , ( "height", "100px" )
         ]
 
 
@@ -204,15 +246,35 @@ styleMonthEvents =
         ]
 
 
-styleMonthEvent =
+monthEventsMixin =
+    [ ( "padding", "2px 5px" )
+    , ( "background-color", "#3174ad" )
+    , ( "text-overflow", "ellipsis" )
+    , ( "white-space", "nowrap" )
+    , ( "overflow", "hidden" )
+    , ( "color", "white" )
+    , ( "cursor", "pointer" )
+    ]
+
+
+monthEventStartsAndEndsMixin =
+    monthEventsMixin ++ [ ( "border-radius", "5px" ) ]
+
+
+monthEventContinuesAfterMixin =
+    monthEventsMixin ++ [ ( "border-radius", "0 0 5px 5px" ) ]
+
+
+monthEventContinuesPriorMixin =
+    monthEventsMixin ++ [ ( "border-radius", "5px 5px 0 0" ) ]
+
+
+monthEventContinuesAfterAndPriorMixin =
+    monthEventsMixin
+
+
+styleMonthWeekRow =
     style
-        [ ( "width", "110px" )
-        , ( "padding", "2px 5px" )
-        , ( "border-radius", "5px" )
-        , ( "background-color", "#3174ad" )
-        , ( "text-overflow", "ellipsis" )
-        , ( "white-space", "nowrap" )
-        , ( "overflow", "hidden" )
-        , ( "color", "white" )
-        , ( "cursor", "pointer" )
+        [ ( "display", "flex" )
+        , ( "flex-direction", "row" )
         ]
