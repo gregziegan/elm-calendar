@@ -7,6 +7,7 @@ import Date exposing (Date)
 import Date.Extra
 import Date.Extra.Facts as DateFacts
 import DefaultStyles exposing (..)
+import List.Extra
 import Time
 
 
@@ -119,7 +120,7 @@ view state =
                     viewMonth state
 
                 Week ->
-                    viewWeek state (dayRangeOfWeek state.viewing)
+                    viewWeek state (weekRangeFromDate state.viewing)
 
                 Day ->
                     viewDay state.viewing
@@ -133,15 +134,16 @@ view state =
             ]
 
 
-dayRangeOfWeek date =
+weekRangeFromDate : Date -> List Date
+weekRangeFromDate date =
     let
-        firstOfWeek =
-            Date.Extra.floor Date.Extra.Week date
+        startOfWeek =
+            Date.Extra.floor Date.Extra.Sunday date
     in
         Date.Extra.range Date.Extra.Day
             1
-            (Date.Extra.floor Date.Extra.Sunday firstOfWeek)
-            (Date.Extra.ceiling Date.Extra.Sunday firstOfWeek)
+            startOfWeek
+            (Date.Extra.add Date.Extra.Week 1 startOfWeek)
 
 
 viewToolbar state =
@@ -153,18 +155,8 @@ viewToolbar state =
 
 
 viewTitle { viewing } =
-    let
-        month =
-            toString <| Date.month viewing
-
-        year =
-            toString <| Date.year viewing
-
-        title =
-            month ++ " " ++ year
-    in
-        div []
-            [ h2 [] [ text title ] ]
+    div []
+        [ h2 [] [ text <| Date.Extra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
 viewPagination state =
@@ -183,56 +175,26 @@ viewTimespanSelection state =
         ]
 
 
-getMonthRange : Date -> List (List Date)
-getMonthRange date =
+weekRangesFromMonth : Int -> Date.Month -> List (List Date)
+weekRangesFromMonth year month =
     let
-        begMonth =
-            Date.Extra.floor Date.Extra.Month date
+        firstOfMonth =
+            Date.Extra.fromCalendarDate year month 1
 
-        endMonth =
-            Date.Extra.ceiling Date.Extra.Month date
-
-        begOfMonthWeekdayNum =
-            Date.Extra.weekdayNumber begMonth
-
-        monthRange =
-            Date.Extra.range Date.Extra.Day 1 begMonth endMonth
-
-        previousMonthFirstDate =
-            Date.Extra.add Date.Extra.Day (-1 * begOfMonthWeekdayNum) begMonth
-
-        previousMonthRange =
-            Date.Extra.range Date.Extra.Day 1 previousMonthFirstDate begMonth
-
-        endOfMonthWeekdayNum =
-            Date.Extra.weekdayNumber endMonth
-
-        nextMonthLastDate =
-            Date.Extra.add Date.Extra.Day (7 - endOfMonthWeekdayNum) endMonth
-
-        nextMonthRange =
-            Date.Extra.range Date.Extra.Day 1 endMonth nextMonthLastDate
-
-        fullRange =
-            List.concat [ previousMonthRange, monthRange, nextMonthRange ]
+        firstOfNextMonth =
+            Date.Extra.add Date.Extra.Month 1 firstOfMonth
     in
-        [ List.take 7 fullRange
-        , List.drop 7 <| List.take 14 fullRange
-        , List.drop 14 <| List.take 21 fullRange
-        , List.drop 21 <| List.take 28 fullRange
-        , List.drop 28 <| List.take 35 fullRange
-        ]
-            ++ if List.length fullRange > 35 then
-                [ List.drop 35 <| List.take 42 fullRange ]
-               else
-                []
+        Date.Extra.range Date.Extra.Day 1
+            (Date.Extra.floor Date.Extra.Sunday firstOfMonth)
+            (Date.Extra.ceiling Date.Extra.Sunday firstOfNextMonth)
+        |> List.Extra.groupsOf 7
 
 
 viewMonth : State -> Html Msg
 viewMonth state =
     let
         weeks =
-            getMonthRange state.viewing
+            weekRangesFromMonth (Date.year state.viewing) (Date.month state.viewing)
 
         styleWeek =
             style
@@ -268,12 +230,8 @@ viewWeekHeader days =
 
 
 viewDate day =
-    let
-        title day =
-            (toString <| Date.dayOfWeek day) ++ " " ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
-    in
-        div [ styleDateHeader ]
-            [ a [ styleDate, href "#" ] [ text <| title day ] ]
+    div [ styleDateHeader ]
+        [ a [ styleDate, href "#" ] [ text <| Date.Extra.toFormattedString "EEE d" day ] ]
 
 
 viewTimeGutterHeader =
@@ -308,10 +266,10 @@ hours date =
         midnight =
             Date.Extra.floor Date.Extra.Day date
 
-        lastHour =
-            Date.Extra.ceiling Date.Extra.Day date
+        nextMidnight =
+            Date.Extra.add Date.Extra.Day 1 midnight
     in
-        Date.Extra.range Date.Extra.Hour 1 midnight lastHour
+        Date.Extra.range Date.Extra.Hour 1 midnight nextMidnight
 
 
 viewTimeGutter date =
@@ -409,8 +367,8 @@ viewAgenda date =
         groupedEvents =
             eventsGroupedByDate events
 
-        isDateInMonth eventsDate =
-            Date.Extra.isBetween (Date.Extra.floor Date.Extra.Month date) (Date.Extra.ceiling Date.Extra.Month date) eventsDate
+        isDateInMonth =
+            Date.Extra.equalBy Date.Extra.Month date
 
         filteredEventsByMonth =
             List.filter (isDateInMonth << .date) groupedEvents
@@ -434,7 +392,7 @@ viewAgendaHeader =
 viewAgendaDay eventGroup =
     let
         dateString =
-            Date.Extra.toFormattedString "EE MM d" eventGroup.date
+            Date.Extra.toFormattedString "EEE MMM d" eventGroup.date
     in
         div [ styleAgendaDay ]
             [ div [ styleAgendaDateCell ] [ text <| dateString ]
