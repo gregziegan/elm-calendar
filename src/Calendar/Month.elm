@@ -14,7 +14,7 @@ view : ViewConfig event -> List event -> Date -> Html msg
 view config events viewing =
     let
         weeks =
-            Helpers.getMonthRange viewing
+            Helpers.weekRangesFromMonth (Date.year viewing) (Date.month viewing)
     in
         div [ styleColumn ]
             [ viewMonthHeader

@@ -2,6 +2,7 @@ module Helpers exposing (..)
 
 import Date exposing (Date)
 import Date.Extra
+import List.Extra
 
 
 hourString : Date -> String
@@ -21,51 +22,23 @@ hours date =
         Date.Extra.range Date.Extra.Hour 1 midnight lastHour
 
 
-getMonthRange : Date -> List (List Date)
-getMonthRange date =
+weekRangesFromMonth : Int -> Date.Month -> List (List Date)
+weekRangesFromMonth year month =
     let
-        begMonth =
-            Date.Extra.floor Date.Extra.Month date
+        firstOfMonth =
+            Date.Extra.fromCalendarDate year month 1
 
-        endMonth =
-            Date.Extra.ceiling Date.Extra.Month date
-
-        begOfMonthWeekdayNum =
-            Date.Extra.weekdayNumber begMonth
-
-        monthRange =
-            Date.Extra.range Date.Extra.Day 1 begMonth endMonth
-
-        previousMonthFirstDate =
-            Date.Extra.add Date.Extra.Day (-1 * begOfMonthWeekdayNum) begMonth
-
-        previousMonthRange =
-            Date.Extra.range Date.Extra.Day 1 previousMonthFirstDate begMonth
-
-        endOfMonthWeekdayNum =
-            Date.Extra.weekdayNumber endMonth
-
-        nextMonthLastDate =
-            Date.Extra.add Date.Extra.Day (7 - endOfMonthWeekdayNum) endMonth
-
-        nextMonthRange =
-            Date.Extra.range Date.Extra.Day 1 endMonth nextMonthLastDate
-
-        fullRange =
-            List.concat [ previousMonthRange, monthRange, nextMonthRange ]
+        firstOfNextMonth =
+            Date.Extra.add Date.Extra.Month 1 firstOfMonth
     in
-        [ List.take 7 fullRange
-        , List.drop 7 <| List.take 14 fullRange
-        , List.drop 14 <| List.take 21 fullRange
-        , List.drop 21 <| List.take 28 fullRange
-        , List.drop 28 <| List.take 35 fullRange
-        ]
-            ++ if List.length fullRange > 35 then
-                [ List.drop 35 <| List.take 42 fullRange ]
-               else
-                []
+        Date.Extra.range Date.Extra.Day
+            1
+            (Date.Extra.floor Date.Extra.Sunday firstOfMonth)
+            (Date.Extra.ceiling Date.Extra.Sunday firstOfNextMonth)
+            |> List.Extra.groupsOf 7
 
 
+dayRangeOfWeek : Date -> List Date
 dayRangeOfWeek date =
     let
         firstOfWeek =
