@@ -10,7 +10,7 @@ view : Date -> Html msg
 view viewing =
     let
         weeks =
-            Helpers.getMonthRange viewing
+            Helpers.weekRangesFromMonth (Date.year viewing) (Date.month viewing)
 
         viewWeek week =
             div [ styleMonthWeek ]

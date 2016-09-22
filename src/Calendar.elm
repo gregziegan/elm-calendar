@@ -108,14 +108,10 @@ viewToolbar viewing timespan =
         ]
 
 
-viewTitle : Date -> Html msg
+viewTitle : Date -> Html Msg
 viewTitle viewing =
-    let
-        title =
-            Date.Extra.toFormattedString "MMMM y" viewing
-    in
-        div []
-            [ h2 [] [ text title ] ]
+    div []
+        [ h2 [] [ text <| Date.Extra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
 viewPagination : Html Msg
