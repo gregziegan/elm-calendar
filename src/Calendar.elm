@@ -1,132 +1,107 @@
-module Calendar exposing (..)
+module Calendar
+    exposing
+        ( init
+        , State
+        , Msg
+        , update
+        , page
+        , changeTimespan
+        , view
+        , viewConfig
+        , ViewConfig
+        )
+
+{-|
+
+Hey it's a calendar!
+
+# Definition
+@docs init, State
+
+# Update
+@docs Msg, update, page, changeTimespan
+
+# View
+@docs view, viewConfig, ViewConfig
+-}
 
 import Html exposing (..)
-import Html.Events exposing (..)
 import Date exposing (Date)
-import Date.Extra
-import DefaultStyles exposing (..)
 import Config exposing (ViewConfig, defaultConfig)
-import Calendar.Agenda as Agenda
-import Calendar.Day as Day
-import Calendar.Month as Month
-import Calendar.Week as Week
-import Helpers exposing (TimeSpan(..))
+import Helpers
+import Calendar.Calendar as Internal
+import Html.App as Html
 
 
-type alias State =
-    { timespan : String
-    , viewing : Date
-    }
-
-
+{-| Create the calendar
+-}
 init : String -> Date -> State
 init timespan viewing =
-    { timespan = timespan
-    , viewing = viewing
-    }
+    State
+        { timespan = timespan
+        , viewing = viewing
+        }
 
 
+{-| I won't tell you what's in here
+-}
+type State
+    = State Internal.State
+
+
+{-| Somehow update plz
+-}
 type Msg
-    = PageBack
-    | PageForward
-    | ChangeTimeSpan TimeSpan
+    = Internal Internal.Msg
 
 
+{-| oh yes, please solve my UI update problems
+-}
 update : Msg -> State -> State
-update msg state =
-    case msg of
-        PageBack ->
-            state
-                |> page -1
-
-        PageForward ->
-            state
-                |> page 1
-
-        ChangeTimeSpan timespan ->
-            state
-                |> changeTimespan timespan
+update (Internal msg) (State state) =
+    State <| Internal.update msg state
 
 
+{-| Page by some interval based on the current view: Month, Week, Day
+-}
 page : Int -> State -> State
-page step state =
-    let
-        { timespan, viewing } =
-            state
-
-        timespanType =
-            Helpers.toTimeSpan timespan
-    in
-        case timespanType of
-            Week ->
-                { state | viewing = Date.Extra.add Date.Extra.Week step viewing }
-
-            Day ->
-                { state | viewing = Date.Extra.add Date.Extra.Day step viewing }
-
-            _ ->
-                { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
+page step (State state) =
+    State <| Internal.page step state
 
 
+{-| Change between views like Month, Week, Day, etc.
+-}
 changeTimespan : Helpers.TimeSpan -> State -> State
-changeTimespan timespan state =
-    { state | timespan = Helpers.fromTimeSpan timespan }
+changeTimespan timespan (State state) =
+    State <| Internal.changeTimespan timespan state
 
 
+{-| Show me the money
+-}
 view : ViewConfig event -> List event -> State -> Html Msg
-view config events { viewing, timespan } =
-    let
-        timespanType =
-            Helpers.toTimeSpan timespan
-
-        calendarView =
-            case timespanType of
-                Month ->
-                    Month.view config events viewing
-
-                Week ->
-                    Week.view config events viewing
-
-                Day ->
-                    Day.view config events viewing
-
-                Agenda ->
-                    Agenda.view config events viewing
-    in
-        div [ styleCalendar ]
-            [ viewToolbar viewing timespanType
-            , calendarView
-            ]
+view (ViewConfig config) events (State state) =
+    Html.map Internal (Internal.view config events state)
 
 
-viewToolbar : Date -> TimeSpan -> Html Msg
-viewToolbar viewing timespan =
-    div [ styleToolbar ]
-        [ viewPagination
-        , viewTitle viewing
-        , viewTimespanSelection timespan
-        ]
+{-| Configure definition
+-}
+type ViewConfig event
+    = ViewConfig (Config.ViewConfig event)
 
 
-viewTitle : Date -> Html Msg
-viewTitle viewing =
-    div []
-        [ h2 [] [ text <| Date.Extra.toFormattedString "MMMM yyyy" viewing ] ]
-
-
-viewPagination : Html Msg
-viewPagination =
-    div []
-        [ button [ styleButton, onClick PageBack ] [ text "back" ]
-        , button [ styleButton, onClick PageForward ] [ text "next" ]
-        ]
-
-
-viewTimespanSelection : TimeSpan -> Html Msg
-viewTimespanSelection timespan =
-    div []
-        [ button [ styleButton, onClick (ChangeTimeSpan Month) ] [ text "Month" ]
-        , button [ styleButton, onClick (ChangeTimeSpan Week) ] [ text "Week" ]
-        , button [ styleButton, onClick (ChangeTimeSpan Day) ] [ text "Day" ]
-        , button [ styleButton, onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
-        ]
+{-| configure it
+-}
+viewConfig :
+    { toId : event -> String
+    , title : event -> String
+    , start : event -> Date
+    , end : event -> Date
+    }
+    -> ViewConfig event
+viewConfig { toId, title, start, end } =
+    ViewConfig
+        { toId = toId
+        , title = title
+        , start = start
+        , end = end
+        }
