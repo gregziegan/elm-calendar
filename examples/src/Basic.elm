@@ -22,7 +22,7 @@ type alias Model =
 
 model : Model
 model =
-    { calendarState = Calendar.init "Month" (Date.fromTime 1473652025106) }
+    { calendarState = Calendar.init "Month" (Date.fromTime someUnixTime) }
 
 
 type Msg
@@ -52,6 +52,7 @@ viewConfig =
         }
 
 
+someUnixTime : Float
 someUnixTime =
     1473652025106
 
