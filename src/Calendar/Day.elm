@@ -12,7 +12,7 @@ view : ViewConfig event -> List event -> Date -> Html msg
 view config events day =
     div [ class "elm-calendar--day" ]
         [ viewDayHeader day
-        , div [ style [ ( "display", "flex" ) ] ]
+        , div [ class "elm-calendar--day-content" ]
             [ viewTimeGutter day
             , viewDaySlot day
             ]
@@ -46,21 +46,21 @@ viewTimeGutter date =
 
 viewTimeGutterHeader : Html msg
 viewTimeGutterHeader =
-    div [ style [ ( "min-width", "70px" ) ] ] []
+    div [ class "elm-calendar--time-gutter-header" ] []
 
 
 viewTimeSlotGroup : Date -> Html msg
 viewTimeSlotGroup date =
     div [ class "elm-calendar--time-slot-group" ]
         [ viewTimeSlot date
-        , div [ style [ ( "flex", "1 0 0" ) ] ] []
+        , div [ class "elm-calendar--time-slot" ] []
         ]
 
 
 viewTimeSlot : Date -> Html msg
 viewTimeSlot date =
-    div [ style [ ( "padding", "0 5px" ), ( "flex", "1 0 0" ) ] ]
-        [ span [ style [ ( "font-size", "14px" ) ] ] [ text <| Helpers.hourString date ] ]
+    div [ class "elm-calendar--hour-slot" ]
+        [ span [ class "elm-calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
 
 
 viewDaySlot : Date -> Html msg
@@ -73,8 +73,8 @@ viewDaySlot day =
 viewDaySlotGroup : Date -> Html msg
 viewDaySlotGroup date =
     div [ class "elm-calendar--time-slot-group" ]
-        [ div [ style [ ( "flex", "1 0 0" ) ] ] []
-        , div [ style [ ( "flex", "1 0 0" ) ] ] []
+        [ div [ class "elm-calendar--time-slot" ] []
+        , div [ class "elm-calendar--time-slot" ] []
         ]
 
 
@@ -82,7 +82,7 @@ viewAllDayCell : List Date -> Html msg
 viewAllDayCell days =
     let
         viewAllDayText =
-            div [ style [ ( "min-width", "70px" ), ( "padding", "0 5px" ) ] ] [ text "All day" ]
+            div [ class "elm-calendar--all-day-text" ] [ text "All day" ]
 
         viewAllDay day =
             div [ class "elm-calendar--all-day" ]

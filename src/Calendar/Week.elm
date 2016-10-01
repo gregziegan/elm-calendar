@@ -16,9 +16,12 @@ viewWeekContent config events viewing days =
 
 viewWeekDay : Date -> Html msg
 viewWeekDay day =
-    div [ class "elm-calendar--day" ]
-        [ viewDaySlot day
-        ]
+    let
+        numToDaySlotView _ =
+            viewDaySlotGroup <| Date.fromTime 0
+    in
+        div [ class "elm-calendar--day" ]
+            (List.map numToDaySlotView [1..24])
 
 
 view : ViewConfig event -> List event -> Date -> Html msg

@@ -69,6 +69,10 @@
   border-left: 1px solid #d7d7d7;
 }
 
+.elm-calendar--time-slot {
+  flex: 1 0 0;
+}
+
 .elm-calendar--column {
   display: flex;
   flex-direction: column;
@@ -210,4 +214,26 @@
 
 .elm-calendar--month-event-continues-prior {
   border-radius: 5px 5px 0 0;
+}
+
+.elm-calendar--day-content {
+  display: flex;
+}
+
+.elm-calendar--time-gutter-header {
+  min-width: 70px;
+}
+
+.elm-calendar--time-slot-text {
+  font-size: 14px;
+}
+
+.elm-calendar--hour-slot {
+  padding: 0 5px;
+  flex: 1 0 0;
+}
+
+.elm-calendar--all-day-text {
+  padding: 0 5px;
+  min-width: 70px;
 }
