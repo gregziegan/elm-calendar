@@ -28,7 +28,7 @@ viewMonthHeader =
         viewDayOfWeek int =
             viewDay <| Date.Extra.Facts.dayOfWeekFromWeekdayNumber int
     in
-        div [ class "elm-calendar--row", style [ ( "width", "1200px" ) ] ] (List.map viewDayOfWeek [0..6])
+        div [ class "elm-calendar--row" ] (List.map viewDayOfWeek [0..6])
 
 
 viewDay : Date.Day -> Html msg
@@ -47,7 +47,7 @@ viewMonthRow config events week =
 
 viewMonthRowBackground : List Date -> Html msg
 viewMonthRowBackground week =
-    div [ class "elm-calendar--month-row" ]
+    div [ class "elm-calendar--month-row-background" ]
         (List.map (\_ -> div [ class "elm-calendar--cell" ] []) week)
 
 
