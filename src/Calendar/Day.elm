@@ -5,13 +5,12 @@ import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Config exposing (ViewConfig)
-import DefaultStyles exposing (..)
 import Helpers
 
 
 view : ViewConfig event -> List event -> Date -> Html msg
 view config events day =
-    div [ styleDay ]
+    div [ class "elm-calendar--day" ]
         [ viewDayHeader day
         , div [ style [ ( "display", "flex" ) ] ]
             [ viewTimeGutter day
@@ -26,8 +25,8 @@ viewDate day =
         title day =
             (toString <| Date.dayOfWeek day) ++ " " ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
     in
-        div [ styleDateHeader ]
-            [ a [ styleDate, href "#" ] [ text <| title day ] ]
+        div [ class "elm-calendar--day-header" ]
+            [ a [ class "elm-calendar--date", href "#" ] [ text <| title day ] ]
 
 
 viewDayHeader : Date -> Html msg
@@ -42,7 +41,7 @@ viewTimeGutter : Date -> Html msg
 viewTimeGutter date =
     Helpers.hours date
         |> List.map viewTimeSlotGroup
-        |> div [ styleTimeGutter ]
+        |> div [ class "elm-calendar--time-gutter" ]
 
 
 viewTimeGutterHeader : Html msg
@@ -52,7 +51,7 @@ viewTimeGutterHeader =
 
 viewTimeSlotGroup : Date -> Html msg
 viewTimeSlotGroup date =
-    div [ styleTimeSlotGroup ]
+    div [ class "elm-calendar--time-slot-group" ]
         [ viewTimeSlot date
         , div [ style [ ( "flex", "1 0 0" ) ] ] []
         ]
@@ -68,12 +67,12 @@ viewDaySlot : Date -> Html msg
 viewDaySlot day =
     Helpers.hours day
         |> List.map viewDaySlotGroup
-        |> div [ styleDaySlot ]
+        |> div [ class "elm-calendar--day-slot" ]
 
 
 viewDaySlotGroup : Date -> Html msg
 viewDaySlotGroup date =
-    div [ styleTimeSlotGroup ]
+    div [ class "elm-calendar--time-slot-group" ]
         [ div [ style [ ( "flex", "1 0 0" ) ] ] []
         , div [ style [ ( "flex", "1 0 0" ) ] ] []
         ]
@@ -86,8 +85,8 @@ viewAllDayCell days =
             div [ style [ ( "min-width", "70px" ), ( "padding", "0 5px" ) ] ] [ text "All day" ]
 
         viewAllDay day =
-            div [ styleAllDay ]
+            div [ class "elm-calendar--all-day" ]
                 []
     in
-        div [ styleAllDayCell ]
+        div [ class "elm-calendar--all-day-cell" ]
             (viewAllDayText :: List.map viewAllDay days)

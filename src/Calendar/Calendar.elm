@@ -1,10 +1,10 @@
 module Calendar.Calendar exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
-import DefaultStyles exposing (..)
 import Config exposing (ViewConfig, defaultConfig)
 import Calendar.Agenda as Agenda
 import Calendar.Day as Day
@@ -93,7 +93,7 @@ view config events { viewing, timespan } =
                 Agenda ->
                     Agenda.view config events viewing
     in
-        div [ styleCalendar ]
+        div [ class "elm-calendar--calendar" ]
             [ viewToolbar viewing timespanType
             , calendarView
             ]
@@ -101,7 +101,7 @@ view config events { viewing, timespan } =
 
 viewToolbar : Date -> TimeSpan -> Html Msg
 viewToolbar viewing timespan =
-    div [ styleToolbar ]
+    div [ class "elm-calendar--toolbar" ]
         [ viewPagination
         , viewTitle viewing
         , viewTimespanSelection timespan
@@ -117,16 +117,16 @@ viewTitle viewing =
 viewPagination : Html Msg
 viewPagination =
     div []
-        [ button [ styleButton, onClick PageBack ] [ text "back" ]
-        , button [ styleButton, onClick PageForward ] [ text "next" ]
+        [ button [ class "elm-calendar--button", onClick PageBack ] [ text "back" ]
+        , button [ class "elm-calendar--button", onClick PageForward ] [ text "next" ]
         ]
 
 
 viewTimespanSelection : TimeSpan -> Html Msg
 viewTimespanSelection timespan =
     div []
-        [ button [ styleButton, onClick (ChangeTimeSpan Month) ] [ text "Month" ]
-        , button [ styleButton, onClick (ChangeTimeSpan Week) ] [ text "Week" ]
-        , button [ styleButton, onClick (ChangeTimeSpan Day) ] [ text "Day" ]
-        , button [ styleButton, onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
+        [ button [ class "elm-calendar--button", onClick (ChangeTimeSpan Month) ] [ text "Month" ]
+        , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
+        , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
+        , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
         ]

@@ -1,22 +1,22 @@
 module Calendar.Week exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Calendar.Day exposing (..)
 import Config exposing (ViewConfig)
-import DefaultStyles exposing (..)
 import Helpers
 
 
 viewWeekContent : ViewConfig event -> List event -> Date -> List Date -> Html msg
 viewWeekContent config events viewing days =
-    div [ styleWeekContent ]
+    div [ class "elm-calendar--week-content" ]
         ([ viewTimeGutter viewing ] ++ (List.map viewWeekDay days))
 
 
 viewWeekDay : Date -> Html msg
 viewWeekDay day =
-    div [ styleDay ]
+    div [ class "elm-calendar--day" ]
         [ viewDaySlot day
         ]
 
@@ -27,7 +27,7 @@ view config events viewing =
         weekRange =
             Helpers.dayRangeOfWeek viewing
     in
-        div [ styleWeek ]
+        div [ class "elm-calendar--week" ]
             [ viewWeekHeader weekRange
             , viewWeekContent config events viewing weekRange
             ]
@@ -35,7 +35,7 @@ view config events viewing =
 
 viewWeekHeader : List Date -> Html msg
 viewWeekHeader days =
-    div [ styleWeekHeader ]
+    div [ class "elm-calendar--week-header" ]
         [ viewDates days
         , viewAllDayCell days
         ]
@@ -43,5 +43,5 @@ viewWeekHeader days =
 
 viewDates : List Date -> Html msg
 viewDates days =
-    div [ styleDates ]
+    div [ class "elm-calendar--dates" ]
         (viewTimeGutterHeader :: List.map viewDate days)

@@ -4,7 +4,6 @@ import Date exposing (Date)
 import Date.Extra
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import DefaultStyles exposing (..)
 import Helpers
 import Config exposing (ViewConfig, defaultConfig)
 
@@ -57,16 +56,16 @@ view config events date =
         filteredEventsByMonth =
             List.filter (isDateInMonth << .date) groupedEvents
     in
-        div [ styleAgenda ]
+        div [ class "elm-calendar--agenda" ]
             (viewAgendaHeader :: List.map (viewAgendaDay config) filteredEventsByMonth)
 
 
 viewAgendaHeader : Html msg
 viewAgendaHeader =
-    div [ styleAgendaHeader ]
-        [ div [ styleHeaderCell ] [ text "Date" ]
-        , div [ styleHeaderCell ] [ text "Time" ]
-        , div [ styleHeaderCell ] [ text "Event" ]
+    div [ class "elm-calendar--agenda-header" ]
+        [ div [ class "elm-calendar--header-cell" ] [ text "Date" ]
+        , div [ class "elm-calendar--header-cell" ] [ text "Time" ]
+        , div [ class "elm-calendar--header-cell" ] [ text "Event" ]
         ]
 
 
@@ -76,8 +75,8 @@ viewAgendaDay config eventGroup =
         dateString =
             Date.Extra.toFormattedString "EE MM d" eventGroup.date
     in
-        div [ styleAgendaDay ]
-            [ div [ styleAgendaDateCell ] [ text <| dateString ]
+        div [ class "elm-calendar--agenda-day" ]
+            [ div [ class "elm-calendar--agenda-date-cell" ] [ text <| dateString ]
             , viewAgendaTimes config eventGroup.events
             ]
 
@@ -100,7 +99,7 @@ viewEventAndTime config event =
         timeRange =
             startTime ++ " - " ++ endTime
     in
-        div [ style [ ( "display", "flex" ) ] ]
-            [ div [ styleAgendaCell ] [ text timeRange ]
-            , div [ styleAgendaCell ] [ text <| config.title event ]
+        div [ class "elm-calendar--row" ]
+            [ div [ class "elm-calendar--agenda-cell" ] [ text timeRange ]
+            , div [ class "elm-calendar--agenda-cell" ] [ text <| config.title event ]
             ]

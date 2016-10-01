@@ -37,10 +37,7 @@ import Html.App as Html
 -}
 init : String -> Date -> State
 init timespan viewing =
-    State
-        { timespan = timespan
-        , viewing = viewing
-        }
+    State <| Internal.init timespan viewing
 
 
 {-| I won't tell you what's in here
