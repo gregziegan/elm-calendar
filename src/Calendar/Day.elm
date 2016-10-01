@@ -25,7 +25,7 @@ viewDate day =
         title day =
             (toString <| Date.dayOfWeek day) ++ " " ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
     in
-        div [ class "elm-calendar--day-header" ]
+        div [ class "elm-calendar--date-header" ]
             [ a [ class "elm-calendar--date", href "#" ] [ text <| title day ] ]
 
 
