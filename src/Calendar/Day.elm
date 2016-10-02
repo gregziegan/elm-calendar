@@ -10,6 +10,7 @@ import Helpers
 import Calendar.Msg exposing (Msg(..))
 import Json.Decode as Json
 import Mouse
+import Calendar.Event as Event exposing (eventWithinRange)
 
 
 view : ViewConfig event -> List event -> Date -> Html Msg
@@ -17,10 +18,11 @@ view config events day =
     div [ class "elm-calendar--day" ]
         [ viewDayHeader day
         , div [ class "elm-calendar--day-content" ]
-            [ viewTimeGutter day
-            , viewDaySlot day
-              -- , viewDayEvents config events day
-            ]
+            ([ viewTimeGutter day
+             , viewDaySlot day
+             ]
+                ++ viewDayEvents config events day
+            )
         ]
 
 
@@ -95,14 +97,22 @@ viewTimeSlot date =
         []
 
 
-viewDayEvents : ViewConfig event -> List event -> Date -> Html Msg
+viewDayEvents : ViewConfig event -> List event -> Date -> List (Html Msg)
 viewDayEvents config events day =
     let
-        event =
-            1
+        maybeViewEvent event =
+            viewDayEvent config day event
     in
-        div [ class "elm-calendar--event" ]
-            []
+        List.filterMap maybeViewEvent events
+
+
+viewDayEvent : ViewConfig event -> Date -> event -> Maybe (Html Msg)
+viewDayEvent config day event =
+    let
+        maybeEventOnDate =
+            eventWithinRange (config.start event) (config.end event) Date.Extra.Day (Helpers.hours day)
+    in
+        Maybe.map (Event.viewDayEvent config event) maybeEventOnDate
 
 
 viewAllDayCell : List Date -> Html Msg

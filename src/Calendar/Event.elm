@@ -9,6 +9,7 @@ import Calendar.Msg exposing (Msg(..))
 import Config exposing (ViewConfig)
 import Json.Decode as Json
 import Mouse
+import Helpers
 
 
 type EventRange
@@ -54,8 +55,8 @@ eventWithinRange start end interval dates =
 
 
 eventStyles : EventRange -> Html.Attribute Msg
-eventStyles eventWithinWeek =
-    case eventWithinWeek of
+eventStyles eventRange =
+    case eventRange of
         StartsAndEnds ->
             class "elm-calendar--event elm-calendar--event-starts-and-ends"
 
@@ -70,7 +71,7 @@ eventStyles eventWithinWeek =
 
 
 viewMonthEvent : ViewConfig event -> event -> EventRange -> List (Html Msg)
-viewMonthEvent config event eventWithinWeek =
+viewMonthEvent config event eventRange =
     let
         eventStart =
             config.start event
@@ -79,7 +80,7 @@ viewMonthEvent config event eventWithinWeek =
             config.end event
 
         numDaysThisWeek =
-            case eventWithinWeek of
+            case eventRange of
                 StartsAndEnds ->
                     Date.Extra.diff Date.Extra.Day eventStart eventEnd + 1
 
@@ -92,7 +93,7 @@ viewMonthEvent config event eventWithinWeek =
                 ContinuesAfterAndPrior ->
                     7
 
-        eventWidthPercentage eventWithinWeek =
+        eventWidthPercentage eventRange =
             (numDaysThisWeek
                 |> toFloat
                 |> (*) cellWidth
@@ -101,21 +102,26 @@ viewMonthEvent config event eventWithinWeek =
                 ++ "%"
     in
         if offsetLength eventStart > 0 then
-            [ rowSegment (Debug.log "offset" (offsetPercentage eventStart)) []
-            , rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment config event eventWithinWeek ]
+            [ rowSegment (offsetPercentage eventStart) []
+            , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange ]
             ]
         else
-            [ rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment config event eventWithinWeek ] ]
+            [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange ] ]
+
+
+viewDayEvent : ViewConfig event -> event -> EventRange -> Html Msg
+viewDayEvent config event eventRange =
+    eventSegment config event eventRange
 
 
 eventSegment : ViewConfig event -> event -> EventRange -> Html Msg
-eventSegment config event eventWithinWeek =
+eventSegment config event eventRange =
     let
         eventId =
             config.toId event
     in
         div
-            [ eventStyles eventWithinWeek
+            [ eventStyles eventRange
             , onClick <| EventClick eventId
             , onMouseEnter <| EventMouseEnter eventId
             , onMouseLeave <| EventMouseLeave eventId
