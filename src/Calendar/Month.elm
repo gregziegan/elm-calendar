@@ -2,14 +2,18 @@ module Calendar.Month exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Date.Extra.Facts
 import Config exposing (ViewConfig)
 import Helpers
+import Calendar.Msg exposing (Msg(..))
+import Json.Decode as Json
+import Mouse
 
 
-view : ViewConfig event -> List event -> Date -> Html msg
+view : ViewConfig event -> List event -> Date -> Html Msg
 view config events viewing =
     let
         weeks =
@@ -22,7 +26,7 @@ view config events viewing =
             ]
 
 
-viewMonthHeader : Html msg
+viewMonthHeader : Html Msg
 viewMonthHeader =
     let
         viewDayOfWeek int =
@@ -31,13 +35,13 @@ viewMonthHeader =
         div [ class "elm-calendar--row" ] (List.map viewDayOfWeek [0..6])
 
 
-viewDay : Date.Day -> Html msg
+viewDay : Date.Day -> Html Msg
 viewDay day =
     div [ class "elm-calendar--month-day-header" ]
         [ a [ class "elm-calendar--date", href "#" ] [ text <| toString day ] ]
 
 
-viewMonthRow : ViewConfig event -> List event -> List Date -> Html msg
+viewMonthRow : ViewConfig event -> List event -> List Date -> Html Msg
 viewMonthRow config events week =
     div [ class "elm-calendar--month-row" ]
         [ viewMonthRowBackground week
@@ -45,13 +49,13 @@ viewMonthRow config events week =
         ]
 
 
-viewMonthRowBackground : List Date -> Html msg
+viewMonthRowBackground : List Date -> Html Msg
 viewMonthRowBackground week =
     div [ class "elm-calendar--month-row-background" ]
         (List.map (\_ -> div [ class "elm-calendar--cell" ] []) week)
 
 
-viewMonthRowContent : ViewConfig event -> List event -> List Date -> Html msg
+viewMonthRowContent : ViewConfig event -> List event -> List Date -> Html Msg
 viewMonthRowContent config events week =
     let
         dateCell date =
@@ -71,7 +75,7 @@ viewMonthRowContent config events week =
             (datesRow :: eventRows)
 
 
-viewMonthWeekRow : Maybe (List (Html msg)) -> Maybe (Html msg)
+viewMonthWeekRow : Maybe (List (Html Msg)) -> Maybe (Html Msg)
 viewMonthWeekRow maybeChildren =
     let
         nest children =
@@ -87,7 +91,7 @@ type EventWithinWeek
     | ContinuesAfterAndPrior
 
 
-eventWeekStyles : EventWithinWeek -> Html.Attribute msg
+eventWeekStyles : EventWithinWeek -> Html.Attribute Msg
 eventWeekStyles eventWithinWeek =
     case eventWithinWeek of
         StartsAndEnds ->
@@ -103,7 +107,7 @@ eventWeekStyles eventWithinWeek =
             class "elm-calendar--month-event"
 
 
-viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (List (Html msg))
+viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (List (Html Msg))
 viewWeekEvent config week event =
     let
         eventStart =
@@ -143,6 +147,18 @@ viewWeekEvent config week event =
                 Just ContinuesPrior
             else
                 Nothing
+    in
+        Maybe.map (viewEvent config event) maybeEventOnDate
+
+
+viewEvent : ViewConfig event -> event -> EventWithinWeek -> List (Html Msg)
+viewEvent config event eventWithinWeek =
+    let
+        eventStart =
+            config.start event
+
+        eventEnd =
+            config.end event
 
         eventWidth eventWithinWeek =
             cellWidth
@@ -163,18 +179,31 @@ viewWeekEvent config week event =
 
         eventWidthPercentage eventWithinWeek =
             (toString <| eventWidth eventWithinWeek) ++ "%"
-
-        eventSegment eventWithinWeek =
-            div [ eventWeekStyles eventWithinWeek ]
-                [ div [ class "elm-calendar--month-event-content" ] [ text <| config.title event ] ]
-
-        viewEvent eventWithinWeek =
-            if offsetLength eventStart > 0 then
-                [ rowSegment (offsetPercentage eventStart) [], rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment eventWithinWeek ] ]
-            else
-                [ rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment eventWithinWeek ] ]
     in
-        Maybe.map viewEvent maybeEventOnDate
+        if offsetLength eventStart > 0 then
+            [ rowSegment (offsetPercentage eventStart) []
+            , rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment config event eventWithinWeek ]
+            ]
+        else
+            [ rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment config event eventWithinWeek ] ]
+
+
+eventSegment : ViewConfig event -> event -> EventWithinWeek -> Html Msg
+eventSegment config event eventWithinWeek =
+    let
+        eventId =
+            config.toId event
+    in
+        div
+            [ eventWeekStyles eventWithinWeek
+            , onClick (EventClick eventId)
+            , onMouseEnter (EventMouseEnter eventId)
+            , onMouseLeave (EventMouseLeave eventId)
+            , on "mousedown" (Json.map (EventDragStart eventId) Mouse.position)
+            ]
+            [ div [ class "elm-calendar--month-event-content" ]
+                [ text <| config.title event ]
+            ]
 
 
 cellWidth : Float
@@ -192,7 +221,7 @@ offsetPercentage date =
     (toString <| offsetLength date) ++ "%"
 
 
-styleRowSegment : String -> Html.Attribute msg
+styleRowSegment : String -> Html.Attribute Msg
 styleRowSegment widthPercentage =
     style
         [ ( "flex-basis", widthPercentage )
@@ -200,6 +229,6 @@ styleRowSegment widthPercentage =
         ]
 
 
-rowSegment : String -> List (Html msg) -> Html msg
+rowSegment : String -> List (Html Msg) -> Html Msg
 rowSegment widthPercentage children =
     div [ styleRowSegment widthPercentage ] children
