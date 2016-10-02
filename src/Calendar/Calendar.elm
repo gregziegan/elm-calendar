@@ -30,8 +30,8 @@ type alias Drag =
 
 
 type DragKind
-    = Event
-    | TimeSlot
+    = Event String
+    | TimeSlot Date
 
 
 init : String -> Date -> State
@@ -42,9 +42,9 @@ init timespan viewing =
     }
 
 
-update : EventConfig msg event -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
+update : EventConfig msg -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
 update eventConfig timeSlotConfig msg state =
-    case msg of
+    case Debug.log "msg" msg of
         PageBack ->
             ( state
                 |> page -1
@@ -78,19 +78,49 @@ update eventConfig timeSlotConfig msg state =
             , timeSlotConfig.onMouseLeave date
             )
 
-        TimeSlotDragStart xy ->
-            ( { state | dragState = Just { start = xy, current = xy, kind = TimeSlot } }
-            , timeSlotConfig.onDragStart (Date.fromTime 0)
+        TimeSlotDragStart date xy ->
+            ( { state | dragState = Just { start = xy, current = xy, kind = TimeSlot date } }
+            , timeSlotConfig.onDragStart date
             )
 
-        TimeSlotDragging xy ->
+        TimeSlotDragging date xy ->
             ( { state | dragState = (Maybe.map (\{ start, kind } -> Drag start xy kind) state.dragState) }
-            , timeSlotConfig.onDragging (Date.fromTime 0)
+            , timeSlotConfig.onDragging date
             )
 
-        TimeSlotDragEnd { x, y } ->
+        TimeSlotDragEnd date xy ->
             ( { state | dragState = Nothing }
-            , timeSlotConfig.onDragEnd (Date.fromTime 0)
+            , timeSlotConfig.onDragEnd date
+            )
+
+        EventClick eventId ->
+            ( state
+            , eventConfig.onClick eventId
+            )
+
+        EventMouseEnter eventId ->
+            ( state
+            , eventConfig.onMouseEnter eventId
+            )
+
+        EventMouseLeave eventId ->
+            ( state
+            , eventConfig.onMouseLeave eventId
+            )
+
+        EventDragStart eventId xy ->
+            ( { state | dragState = Just { start = xy, current = xy, kind = Event eventId } }
+            , eventConfig.onDragStart eventId
+            )
+
+        EventDragging eventId xy ->
+            ( { state | dragState = (Maybe.map (\{ start, kind } -> Drag start xy kind) state.dragState) }
+            , eventConfig.onDragging eventId
+            )
+
+        EventDragEnd eventId xy ->
+            ( { state | dragState = Nothing }
+            , eventConfig.onDragEnd eventId
             )
 
 
@@ -183,18 +213,17 @@ subscriptions state =
     case state.dragState of
         Just dragState ->
             case dragState.kind of
-                TimeSlot ->
+                TimeSlot date ->
                     Sub.batch
-                        [ Mouse.moves TimeSlotDragging
-                        , Mouse.ups TimeSlotDragEnd
+                        [ Mouse.moves (TimeSlotDragging date)
+                        , Mouse.ups (TimeSlotDragEnd date)
                         ]
 
-                Event ->
-                    Sub.none
+                Event eventId ->
+                    Sub.batch
+                        [ Mouse.moves (EventDragging eventId)
+                        , Mouse.ups (EventDragEnd eventId)
+                        ]
 
-        -- Sub.batch
-        --   [ Mouse.moves
-        --   , Mouse.ups DragEnd
-        --   ]
         _ ->
             Sub.none

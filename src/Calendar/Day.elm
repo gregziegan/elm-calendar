@@ -89,7 +89,7 @@ viewTimeSlot date =
         , onClick (TimeSlotClick date)
         , onMouseEnter (TimeSlotMouseEnter date)
         , onMouseLeave (TimeSlotMouseLeave date)
-        , on "mousedown" (Json.map TimeSlotDragStart Mouse.position)
+        , on "mousedown" (Json.map (TimeSlotDragStart date) Mouse.position)
         ]
         []
 

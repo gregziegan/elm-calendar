@@ -60,7 +60,7 @@ type Msg
 
 {-| oh yes, please solve my UI update problems
 -}
-update : EventConfig msg event -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
+update : EventConfig msg -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
 update (EventConfig eventConfig) (TimeSlotConfig timeSlotConfig) (Internal msg) (State state) =
     let
         ( updatedCalendar, calendarMsg ) =
@@ -104,8 +104,8 @@ type TimeSlotConfig msg
 
 {-| configure event interactions
 -}
-type EventConfig msg event
-    = EventConfig (Config.EventConfig msg event)
+type EventConfig msg
+    = EventConfig (Config.EventConfig msg)
 
 
 {-| configure the view
@@ -151,14 +151,14 @@ timeSlotConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, o
 {-| configure event interactions
 -}
 eventConfig :
-    { onClick : event -> Maybe msg
-    , onMouseEnter : event -> Maybe msg
-    , onMouseLeave : event -> Maybe msg
-    , onDragStart : event -> Maybe msg
-    , onDragging : event -> Maybe msg
-    , onDragEnd : event -> Maybe msg
+    { onClick : String -> Maybe msg
+    , onMouseEnter : String -> Maybe msg
+    , onMouseLeave : String -> Maybe msg
+    , onDragStart : String -> Maybe msg
+    , onDragging : String -> Maybe msg
+    , onDragEnd : String -> Maybe msg
     }
-    -> EventConfig msg event
+    -> EventConfig msg
 eventConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDragEnd } =
     EventConfig
         { onClick = onClick

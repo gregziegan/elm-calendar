@@ -5,7 +5,7 @@ import Date.Extra
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Helpers
-import Config exposing (ViewConfig, defaultViewConfig)
+import Config exposing (ViewConfig)
 
 
 type alias EventGroup event =

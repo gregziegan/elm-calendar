@@ -12,6 +12,12 @@ type Msg
     | TimeSlotClick Date
     | TimeSlotMouseEnter Date
     | TimeSlotMouseLeave Date
-    | TimeSlotDragStart Mouse.Position
-    | TimeSlotDragging Mouse.Position
-    | TimeSlotDragEnd Mouse.Position
+    | TimeSlotDragStart Date Mouse.Position
+    | TimeSlotDragging Date Mouse.Position
+    | TimeSlotDragEnd Date Mouse.Position
+    | EventClick String
+    | EventMouseEnter String
+    | EventMouseLeave String
+    | EventDragStart String Mouse.Position
+    | EventDragging String Mouse.Position
+    | EventDragEnd String Mouse.Position

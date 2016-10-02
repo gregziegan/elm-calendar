@@ -21,11 +21,11 @@ type alias TimeSlotConfig msg =
     }
 
 
-type alias EventConfig msg event =
-    { onClick : event -> Maybe msg
-    , onMouseEnter : event -> Maybe msg
-    , onMouseLeave : event -> Maybe msg
-    , onDragStart : event -> Maybe msg
-    , onDragging : event -> Maybe msg
-    , onDragEnd : event -> Maybe msg
+type alias EventConfig msg =
+    { onClick : String -> Maybe msg
+    , onMouseEnter : String -> Maybe msg
+    , onMouseLeave : String -> Maybe msg
+    , onDragStart : String -> Maybe msg
+    , onDragging : String -> Maybe msg
+    , onDragEnd : String -> Maybe msg
     }

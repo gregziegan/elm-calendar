@@ -72,7 +72,7 @@ viewConfig =
         }
 
 
-eventConfig : Calendar.EventConfig Msg Event
+eventConfig : Calendar.EventConfig Msg
 eventConfig =
     Calendar.eventConfig
         { onClick = \_ -> Nothing
