@@ -191,28 +191,28 @@
   overflow-y: hidden;
 }
 
-.elm-calendar--month-event-content {
+.elm-calendar--event-content {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
 
-.elm-calendar--month-event {
+.elm-calendar--event {
   padding: 2px 5px;
   background-color: #3174ad;
   color: white;
   cursor: pointer;
 }
 
-.elm-calendar--month-event-starts-and-ends {
+.elm-calendar--month-starts-and-ends {
   border-radius: 5px;
 }
 
-.elm-calendar--month-event-continues-after {
+.elm-calendar--month-continues-after {
   border-radius: 0 0 5px 5px;
 }
 
-.elm-calendar--month-event-continues-prior {
+.elm-calendar--month-continues-prior {
   border-radius: 5px 5px 0 0;
 }
 
@@ -239,5 +239,5 @@
 }
 
 .elm-calendar--agenda-times {
-  
+
 }

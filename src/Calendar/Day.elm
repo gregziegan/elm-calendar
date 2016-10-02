@@ -19,6 +19,7 @@ view config events day =
         , div [ class "elm-calendar--day-content" ]
             [ viewTimeGutter day
             , viewDaySlot day
+              -- , viewDayEvents config events day
             ]
         ]
 
@@ -92,6 +93,16 @@ viewTimeSlot date =
         , on "mousedown" (Json.map (TimeSlotDragStart date) Mouse.position)
         ]
         []
+
+
+viewDayEvents : ViewConfig event -> List event -> Date -> Html Msg
+viewDayEvents config events day =
+    let
+        event =
+            1
+    in
+        div [ class "elm-calendar--event" ]
+            []
 
 
 viewAllDayCell : List Date -> Html Msg

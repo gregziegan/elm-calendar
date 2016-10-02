@@ -2,15 +2,13 @@ module Calendar.Month exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Date.Extra.Facts
 import Config exposing (ViewConfig)
 import Helpers
-import Calendar.Msg exposing (Msg(..))
-import Json.Decode as Json
-import Mouse
+import Calendar.Msg exposing (Msg)
+import Calendar.Event as Event exposing (eventStyles, eventWithinRange)
 
 
 view : ViewConfig event -> List event -> Date -> Html Msg
@@ -88,159 +86,10 @@ viewMonthWeekRow maybeChildren =
         Maybe.map nest maybeChildren
 
 
-type EventWithinWeek
-    = StartsAndEnds
-    | ContinuesAfter
-    | ContinuesPrior
-    | ContinuesAfterAndPrior
-
-
-eventWeekStyles : EventWithinWeek -> Html.Attribute Msg
-eventWeekStyles eventWithinWeek =
-    case eventWithinWeek of
-        StartsAndEnds ->
-            class "elm-calendar--month-event elm-calendar--month-event-starts-and-ends"
-
-        ContinuesAfter ->
-            class "elm-calendar--month-event elm-calendar--month-event-continues-after"
-
-        ContinuesPrior ->
-            class "elm-calendar--month-event elm-calendar--month-event-continues-prior"
-
-        ContinuesAfterAndPrior ->
-            class "elm-calendar--month-event"
-
-
 viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (List (Html Msg))
 viewWeekEvent config week event =
     let
-        eventStart =
-            config.start event
-
-        eventEnd =
-            config.end event
-
-        begWeek =
-            Maybe.withDefault eventStart <| List.head <| week
-
-        endWeek =
-            Maybe.withDefault eventEnd <| List.head <| List.reverse week
-
-        startsThisWeek =
-            Date.Extra.isBetween begWeek endWeek eventStart
-
-        endsThisWeek =
-            Date.Extra.isBetween begWeek endWeek eventEnd
-
-        startsWeeksPrior =
-            Date.Extra.diff Date.Extra.Millisecond eventStart begWeek
-                |> (>) 0
-
-        endsWeeksAfter =
-            Date.Extra.diff Date.Extra.Millisecond endWeek eventEnd
-                |> (>) 0
-
         maybeEventOnDate =
-            if startsThisWeek && endsThisWeek then
-                Just StartsAndEnds
-            else if startsWeeksPrior && endsWeeksAfter then
-                Just ContinuesAfterAndPrior
-            else if startsThisWeek && endsWeeksAfter then
-                Just ContinuesAfter
-            else if endsThisWeek && startsWeeksPrior then
-                Just ContinuesPrior
-            else
-                Nothing
+            eventWithinRange (config.start event) (config.end event) Date.Extra.Week week
     in
-        Maybe.map (viewEvent config event) maybeEventOnDate
-
-
-viewEvent : ViewConfig event -> event -> EventWithinWeek -> List (Html Msg)
-viewEvent config event eventWithinWeek =
-    let
-        eventStart =
-            config.start event
-
-        eventEnd =
-            config.end event
-
-        numDaysThisWeek =
-            case eventWithinWeek of
-                StartsAndEnds ->
-                    Date.Extra.diff Date.Extra.Day eventStart eventEnd + 1
-
-                ContinuesAfter ->
-                    7 - (Date.Extra.weekdayNumber eventStart) + 1
-
-                ContinuesPrior ->
-                    7 - (Date.Extra.weekdayNumber eventEnd) + 1
-
-                ContinuesAfterAndPrior ->
-                    7
-
-        eventWidthPercentage eventWithinWeek =
-            (numDaysThisWeek
-                |> toFloat
-                |> (*) cellWidth
-                |> toString
-            )
-                ++ "%"
-    in
-        if offsetLength eventStart > 0 then
-            [ rowSegment (Debug.log "offset" (offsetPercentage eventStart)) []
-            , rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment config event eventWithinWeek ]
-            ]
-        else
-            [ rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment config event eventWithinWeek ] ]
-
-
-eventSegment : ViewConfig event -> event -> EventWithinWeek -> Html Msg
-eventSegment config event eventWithinWeek =
-    let
-        eventId =
-            config.toId event
-    in
-        div
-            [ eventWeekStyles eventWithinWeek
-            , onClick <| EventClick eventId
-            , onMouseEnter <| EventMouseEnter eventId
-            , onMouseLeave <| EventMouseLeave eventId
-            , on "mousedown" <| Json.map (EventDragStart eventId) Mouse.position
-            ]
-            [ div [ class "elm-calendar--month-event-content" ]
-                [ text <| config.title event ]
-            ]
-
-
-cellWidth : Float
-cellWidth =
-    100.0 / 7
-
-
-offsetLength : Date -> Float
-offsetLength date =
-    (Date.Extra.weekdayNumber date)
-        % 7
-        |> toFloat
-        |> (*) cellWidth
-
-
-offsetPercentage : Date -> String
-offsetPercentage date =
-    (offsetLength date
-        |> toString
-    )
-        ++ "%"
-
-
-styleRowSegment : String -> Html.Attribute Msg
-styleRowSegment widthPercentage =
-    style
-        [ ( "flex-basis", widthPercentage )
-        , ( "max-width", widthPercentage )
-        ]
-
-
-rowSegment : String -> List (Html Msg) -> Html Msg
-rowSegment widthPercentage children =
-    div [ styleRowSegment widthPercentage ] children
+        Maybe.map (Event.viewMonthEvent config event) maybeEventOnDate
