@@ -27,13 +27,33 @@ model =
 
 type Msg
     = SetCalendarState Calendar.Msg
+    | SelectDate Date
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         SetCalendarState calendarMsg ->
-            { model | calendarState = Calendar.update calendarMsg model.calendarState }
+            let
+                ( updatedCalendar, maybeMsg ) =
+                    Calendar.update eventConfig timeSlotConfig calendarMsg model.calendarState
+
+                newModel =
+                    { model | calendarState = updatedCalendar }
+            in
+                case maybeMsg of
+                    Nothing ->
+                        newModel
+
+                    Just updateMsg ->
+                        update updateMsg newModel
+
+        SelectDate date ->
+            let
+                whatDate =
+                    Debug.log "date" date
+            in
+                model
 
 
 view : Model -> Html Msg
@@ -49,6 +69,30 @@ viewConfig =
         , title = .title
         , start = .start
         , end = .end
+        }
+
+
+eventConfig : Calendar.EventConfig Msg Event
+eventConfig =
+    Calendar.eventConfig
+        { onClick = \_ -> Nothing
+        , onMouseEnter = \_ -> Nothing
+        , onMouseLeave = \_ -> Nothing
+        , onDragStart = \_ -> Nothing
+        , onDragging = \_ -> Nothing
+        , onDragEnd = \_ -> Nothing
+        }
+
+
+timeSlotConfig : Calendar.TimeSlotConfig Msg
+timeSlotConfig =
+    Calendar.timeSlotConfig
+        { onClick = \date -> Just <| SelectDate date
+        , onMouseEnter = \_ -> Nothing
+        , onMouseLeave = \_ -> Nothing
+        , onDragStart = \_ -> Nothing
+        , onDragging = \_ -> Nothing
+        , onDragEnd = \_ -> Nothing
         }
 
 

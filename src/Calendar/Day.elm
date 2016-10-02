@@ -2,13 +2,15 @@ module Calendar.Day exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Config exposing (ViewConfig)
 import Helpers
+import Calendar.Msg exposing (Msg(..))
 
 
-view : ViewConfig event -> List event -> Date -> Html msg
+view : ViewConfig event -> List event -> Date -> Html Msg
 view config events day =
     div [ class "elm-calendar--day" ]
         [ viewDayHeader day
@@ -19,7 +21,7 @@ view config events day =
         ]
 
 
-viewDate : Date -> Html msg
+viewDate : Date -> Html Msg
 viewDate day =
     let
         title day =
@@ -29,7 +31,7 @@ viewDate day =
             [ a [ class "elm-calendar--date", href "#" ] [ text <| title day ] ]
 
 
-viewDayHeader : Date -> Html msg
+viewDayHeader : Date -> Html Msg
 viewDayHeader day =
     div []
         [ viewTimeGutterHeader
@@ -37,48 +39,57 @@ viewDayHeader day =
         ]
 
 
-viewTimeGutter : Date -> Html msg
+viewTimeGutter : Date -> Html Msg
 viewTimeGutter date =
     Helpers.hours date
         |> List.map viewTimeSlotGroup
         |> div [ class "elm-calendar--time-gutter" ]
 
 
-viewTimeGutterHeader : Html msg
+viewTimeGutterHeader : Html Msg
 viewTimeGutterHeader =
     div [ class "elm-calendar--time-gutter-header" ] []
 
 
-viewTimeSlotGroup : Date -> Html msg
+viewTimeSlotGroup : Date -> Html Msg
 viewTimeSlotGroup date =
     div [ class "elm-calendar--time-slot-group" ]
-        [ viewTimeSlot date
+        [ viewHourSlot date
         , div [ class "elm-calendar--time-slot" ] []
         ]
 
 
-viewTimeSlot : Date -> Html msg
-viewTimeSlot date =
+viewHourSlot : Date -> Html Msg
+viewHourSlot date =
     div [ class "elm-calendar--hour-slot" ]
         [ span [ class "elm-calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
 
 
-viewDaySlot : Date -> Html msg
+viewDaySlot : Date -> Html Msg
 viewDaySlot day =
     Helpers.hours day
         |> List.map viewDaySlotGroup
         |> div [ class "elm-calendar--day-slot" ]
 
 
-viewDaySlotGroup : Date -> Html msg
+viewDaySlotGroup : Date -> Html Msg
 viewDaySlotGroup date =
     div [ class "elm-calendar--time-slot-group" ]
-        [ div [ class "elm-calendar--time-slot" ] []
-        , div [ class "elm-calendar--time-slot" ] []
+        [ viewTimeSlot date
+        , viewTimeSlot date
         ]
 
 
-viewAllDayCell : List Date -> Html msg
+viewTimeSlot : Date -> Html Msg
+viewTimeSlot date =
+    div
+        [ class "elm-calendar--time-slot"
+        , onClick (TimeSlotClick date)
+        ]
+        []
+
+
+viewAllDayCell : List Date -> Html Msg
 viewAllDayCell days =
     let
         viewAllDayText =

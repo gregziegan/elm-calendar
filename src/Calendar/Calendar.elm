@@ -5,12 +5,13 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
-import Config exposing (ViewConfig, defaultConfig)
+import Config exposing (ViewConfig, EventConfig, TimeSlotConfig, defaultViewConfig)
 import Calendar.Agenda as Agenda
 import Calendar.Day as Day
 import Calendar.Month as Month
 import Calendar.Week as Week
 import Helpers exposing (TimeSpan(..))
+import Calendar.Msg exposing (Msg(..))
 
 
 type alias State =
@@ -26,26 +27,31 @@ init timespan viewing =
     }
 
 
-type Msg
-    = PageBack
-    | PageForward
-    | ChangeTimeSpan TimeSpan
-
-
-update : Msg -> State -> State
-update msg state =
+update : EventConfig msg event -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
+update eventConfig timeSlotConfig msg state =
     case msg of
         PageBack ->
-            state
+            ( state
                 |> page -1
+            , Nothing
+            )
 
         PageForward ->
-            state
+            ( state
                 |> page 1
+            , Nothing
+            )
 
         ChangeTimeSpan timespan ->
-            state
+            ( state
                 |> changeTimespan timespan
+            , Nothing
+            )
+
+        TimeSlotClick date ->
+            ( state
+            , timeSlotConfig.onClick date
+            )
 
 
 page : Int -> State -> State

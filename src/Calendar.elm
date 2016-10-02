@@ -9,6 +9,10 @@ module Calendar
         , view
         , viewConfig
         , ViewConfig
+        , eventConfig
+        , EventConfig
+        , timeSlotConfig
+        , TimeSlotConfig
         )
 
 {-|
@@ -19,7 +23,7 @@ Hey it's a calendar!
 @docs init, State
 
 # Update
-@docs Msg, update, page, changeTimespan
+@docs Msg, update, page, changeTimespan, eventConfig, EventConfig, timeSlotConfig, TimeSlotConfig
 
 # View
 @docs view, viewConfig, ViewConfig
@@ -27,9 +31,10 @@ Hey it's a calendar!
 
 import Html exposing (..)
 import Date exposing (Date)
-import Config exposing (ViewConfig, defaultConfig)
+import Config
 import Helpers
 import Calendar.Calendar as Internal
+import Calendar.Msg
 import Html.App as Html
 
 
@@ -49,14 +54,18 @@ type State
 {-| Somehow update plz
 -}
 type Msg
-    = Internal Internal.Msg
+    = Internal Calendar.Msg.Msg
 
 
 {-| oh yes, please solve my UI update problems
 -}
-update : Msg -> State -> State
-update (Internal msg) (State state) =
-    State <| Internal.update msg state
+update : EventConfig msg event -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
+update (EventConfig eventConfig) (TimeSlotConfig timeSlotConfig) (Internal msg) (State state) =
+    let
+        ( updatedCalendar, calendarMsg ) =
+            Internal.update eventConfig timeSlotConfig msg state
+    in
+        ( State updatedCalendar, calendarMsg )
 
 
 {-| Page by some interval based on the current view: Month, Week, Day
@@ -80,13 +89,25 @@ view (ViewConfig config) events (State state) =
     Html.map Internal (Internal.view config events state)
 
 
-{-| Configure definition
+{-| configure view definition
 -}
 type ViewConfig event
     = ViewConfig (Config.ViewConfig event)
 
 
-{-| configure it
+{-| configure time slot interactions
+-}
+type TimeSlotConfig msg
+    = TimeSlotConfig (Config.TimeSlotConfig msg)
+
+
+{-| configure event interactions
+-}
+type EventConfig msg event
+    = EventConfig (Config.EventConfig msg event)
+
+
+{-| configure the view
 -}
 viewConfig :
     { toId : event -> String
@@ -101,4 +122,48 @@ viewConfig { toId, title, start, end } =
         , title = title
         , start = start
         , end = end
+        }
+
+
+{-| configure time slot interactions
+-}
+timeSlotConfig :
+    { onClick : Date -> Maybe msg
+    , onMouseEnter : Date -> Maybe msg
+    , onMouseLeave : Date -> Maybe msg
+    , onDragStart : Date -> Maybe msg
+    , onDragging : Date -> Maybe msg
+    , onDragEnd : Date -> Maybe msg
+    }
+    -> TimeSlotConfig msg
+timeSlotConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDragEnd } =
+    TimeSlotConfig
+        { onClick = onClick
+        , onMouseEnter = onMouseEnter
+        , onMouseLeave = onMouseLeave
+        , onDragStart = onDragStart
+        , onDragging = onDragging
+        , onDragEnd = onDragEnd
+        }
+
+
+{-| configure event interactions
+-}
+eventConfig :
+    { onClick : event -> Maybe msg
+    , onMouseEnter : event -> Maybe msg
+    , onMouseLeave : event -> Maybe msg
+    , onDragStart : event -> Maybe msg
+    , onDragging : event -> Maybe msg
+    , onDragEnd : event -> Maybe msg
+    }
+    -> EventConfig msg event
+eventConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDragEnd } =
+    EventConfig
+        { onClick = onClick
+        , onMouseEnter = onMouseEnter
+        , onMouseLeave = onMouseLeave
+        , onDragStart = onDragStart
+        , onDragging = onDragging
+        , onDragEnd = onDragEnd
         }
