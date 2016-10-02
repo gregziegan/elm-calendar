@@ -179,14 +179,15 @@ viewEvent config event eventWithinWeek =
                     7
 
         eventWidthPercentage eventWithinWeek =
-            numDaysThisWeek
+            (numDaysThisWeek
                 |> toFloat
                 |> (*) cellWidth
                 |> toString
-                |> (++) "%"
+            )
+                ++ "%"
     in
         if offsetLength eventStart > 0 then
-            [ rowSegment (offsetPercentage eventStart) []
+            [ rowSegment (Debug.log "offset" (offsetPercentage eventStart)) []
             , rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment config event eventWithinWeek ]
             ]
         else
@@ -218,17 +219,18 @@ cellWidth =
 
 offsetLength : Date -> Float
 offsetLength date =
-    Date.Extra.weekdayNumber date
-        |> (%) 7
+    (Date.Extra.weekdayNumber date)
+        % 7
         |> toFloat
         |> (*) cellWidth
 
 
 offsetPercentage : Date -> String
 offsetPercentage date =
-    offsetLength date
+    (offsetLength date
         |> toString
-        |> (++) "%"
+    )
+        ++ "%"
 
 
 styleRowSegment : String -> Html.Attribute Msg
