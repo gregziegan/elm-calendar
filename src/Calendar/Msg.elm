@@ -2,6 +2,7 @@ module Calendar.Msg exposing (..)
 
 import Date exposing (Date)
 import Helpers exposing (TimeSpan)
+import Mouse
 
 
 type Msg
@@ -9,3 +10,8 @@ type Msg
     | PageForward
     | ChangeTimeSpan TimeSpan
     | TimeSlotClick Date
+    | TimeSlotMouseEnter Date
+    | TimeSlotMouseLeave Date
+    | TimeSlotDragStart Mouse.Position
+    | TimeSlotDragging Mouse.Position
+    | TimeSlotDragEnd Mouse.Position

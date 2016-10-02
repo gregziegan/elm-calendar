@@ -13,6 +13,7 @@ module Calendar
         , EventConfig
         , timeSlotConfig
         , TimeSlotConfig
+        , subscriptions
         )
 
 {-|
@@ -23,7 +24,7 @@ Hey it's a calendar!
 @docs init, State
 
 # Update
-@docs Msg, update, page, changeTimespan, eventConfig, EventConfig, timeSlotConfig, TimeSlotConfig
+@docs Msg, update, page, changeTimespan, eventConfig, EventConfig, timeSlotConfig, TimeSlotConfig, subscriptions
 
 # View
 @docs view, viewConfig, ViewConfig
@@ -167,3 +168,10 @@ eventConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDr
         , onDragging = onDragging
         , onDragEnd = onDragEnd
         }
+
+
+{-| drag event subscriptions
+-}
+subscriptions : State -> Sub Msg
+subscriptions (State state) =
+    Sub.map Internal (Internal.subscriptions state)

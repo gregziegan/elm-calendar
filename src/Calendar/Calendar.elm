@@ -5,25 +5,40 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
-import Config exposing (ViewConfig, EventConfig, TimeSlotConfig, defaultViewConfig)
+import Config exposing (ViewConfig, EventConfig, TimeSlotConfig)
 import Calendar.Agenda as Agenda
 import Calendar.Day as Day
 import Calendar.Month as Month
 import Calendar.Week as Week
 import Helpers exposing (TimeSpan(..))
 import Calendar.Msg exposing (Msg(..))
+import Mouse
 
 
 type alias State =
     { timespan : String
     , viewing : Date
+    , dragState : Maybe Drag
     }
+
+
+type alias Drag =
+    { start : Mouse.Position
+    , current : Mouse.Position
+    , kind : DragKind
+    }
+
+
+type DragKind
+    = Event
+    | TimeSlot
 
 
 init : String -> Date -> State
 init timespan viewing =
     { timespan = timespan
     , viewing = viewing
+    , dragState = Nothing
     }
 
 
@@ -51,6 +66,31 @@ update eventConfig timeSlotConfig msg state =
         TimeSlotClick date ->
             ( state
             , timeSlotConfig.onClick date
+            )
+
+        TimeSlotMouseEnter date ->
+            ( state
+            , timeSlotConfig.onMouseEnter date
+            )
+
+        TimeSlotMouseLeave date ->
+            ( state
+            , timeSlotConfig.onMouseLeave date
+            )
+
+        TimeSlotDragStart xy ->
+            ( { state | dragState = Just { start = xy, current = xy, kind = TimeSlot } }
+            , timeSlotConfig.onDragStart (Date.fromTime 0)
+            )
+
+        TimeSlotDragging xy ->
+            ( { state | dragState = (Maybe.map (\{ start, kind } -> Drag start xy kind) state.dragState) }
+            , timeSlotConfig.onDragging (Date.fromTime 0)
+            )
+
+        TimeSlotDragEnd { x, y } ->
+            ( { state | dragState = Nothing }
+            , timeSlotConfig.onDragEnd (Date.fromTime 0)
             )
 
 
@@ -136,3 +176,25 @@ viewTimespanSelection timespan =
         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
         ]
+
+
+subscriptions : State -> Sub Msg
+subscriptions state =
+    case state.dragState of
+        Just dragState ->
+            case dragState.kind of
+                TimeSlot ->
+                    Sub.batch
+                        [ Mouse.moves TimeSlotDragging
+                        , Mouse.ups TimeSlotDragEnd
+                        ]
+
+                Event ->
+                    Sub.none
+
+        -- Sub.batch
+        --   [ Mouse.moves
+        --   , Mouse.ups DragEnd
+        --   ]
+        _ ->
+            Sub.none
