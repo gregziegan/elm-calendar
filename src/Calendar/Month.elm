@@ -59,7 +59,11 @@ viewMonthRowContent : ViewConfig event -> List event -> List Date -> Html Msg
 viewMonthRowContent config events week =
     let
         dateCell date =
-            div [ class "elm-calendar--date-cell" ] [ text <| toString <| Date.day date ]
+            div [ class "elm-calendar--date-cell" ]
+                [ Date.day date
+                    |> toString
+                    |> text
+                ]
 
         datesRow =
             div [ class "elm-calendar--row" ] (List.map dateCell week)
@@ -160,25 +164,26 @@ viewEvent config event eventWithinWeek =
         eventEnd =
             config.end event
 
-        eventWidth eventWithinWeek =
-            cellWidth
-                * (toFloat
-                    <| case eventWithinWeek of
-                        StartsAndEnds ->
-                            Date.Extra.diff Date.Extra.Day eventStart eventEnd + 1
+        numDaysThisWeek =
+            case eventWithinWeek of
+                StartsAndEnds ->
+                    Date.Extra.diff Date.Extra.Day eventStart eventEnd + 1
 
-                        ContinuesAfter ->
-                            7 - (Date.Extra.weekdayNumber eventStart) + 1
+                ContinuesAfter ->
+                    7 - (Date.Extra.weekdayNumber eventStart) + 1
 
-                        ContinuesPrior ->
-                            7 - (Date.Extra.weekdayNumber eventEnd) + 1
+                ContinuesPrior ->
+                    7 - (Date.Extra.weekdayNumber eventEnd) + 1
 
-                        ContinuesAfterAndPrior ->
-                            7
-                  )
+                ContinuesAfterAndPrior ->
+                    7
 
         eventWidthPercentage eventWithinWeek =
-            (toString <| eventWidth eventWithinWeek) ++ "%"
+            numDaysThisWeek
+                |> toFloat
+                |> (*) cellWidth
+                |> toString
+                |> (++) "%"
     in
         if offsetLength eventStart > 0 then
             [ rowSegment (offsetPercentage eventStart) []
@@ -196,10 +201,10 @@ eventSegment config event eventWithinWeek =
     in
         div
             [ eventWeekStyles eventWithinWeek
-            , onClick (EventClick eventId)
-            , onMouseEnter (EventMouseEnter eventId)
-            , onMouseLeave (EventMouseLeave eventId)
-            , on "mousedown" (Json.map (EventDragStart eventId) Mouse.position)
+            , onClick <| EventClick eventId
+            , onMouseEnter <| EventMouseEnter eventId
+            , onMouseLeave <| EventMouseLeave eventId
+            , on "mousedown" <| Json.map (EventDragStart eventId) Mouse.position
             ]
             [ div [ class "elm-calendar--month-event-content" ]
                 [ text <| config.title event ]
@@ -208,17 +213,22 @@ eventSegment config event eventWithinWeek =
 
 cellWidth : Float
 cellWidth =
-    (100.0 / 7)
+    100.0 / 7
 
 
 offsetLength : Date -> Float
 offsetLength date =
-    cellWidth * (toFloat <| ((Date.Extra.weekdayNumber date) % 7))
+    Date.Extra.weekdayNumber date
+        |> (%) 7
+        |> toFloat
+        |> (*) cellWidth
 
 
 offsetPercentage : Date -> String
 offsetPercentage date =
-    (toString <| offsetLength date) ++ "%"
+    offsetLength date
+        |> toString
+        |> (++) "%"
 
 
 styleRowSegment : String -> Html.Attribute Msg

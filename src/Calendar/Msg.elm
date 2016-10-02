@@ -1,8 +1,14 @@
 module Calendar.Msg exposing (..)
 
 import Date exposing (Date)
-import Helpers exposing (TimeSpan)
 import Mouse
+
+
+type TimeSpan
+    = Month
+    | Week
+    | Day
+    | Agenda
 
 
 type Msg

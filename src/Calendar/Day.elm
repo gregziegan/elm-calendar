@@ -27,7 +27,7 @@ viewDate : Date -> Html Msg
 viewDate day =
     let
         title day =
-            (toString <| Date.dayOfWeek day) ++ " " ++ (toString <| Date.day day) ++ "/" ++ (toString <| Date.Extra.monthNumber day)
+            Date.Extra.toFormattedString "EE d/M" day
     in
         div [ class "elm-calendar--date-header" ]
             [ a [ class "elm-calendar--date", href "#" ] [ text <| title day ] ]

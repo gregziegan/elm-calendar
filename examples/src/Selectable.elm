@@ -28,7 +28,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    { calendarState = Calendar.init "Month" (Date.fromTime someUnixTime) } ! []
+    { calendarState = Calendar.init Calendar.Month (Date.fromTime someUnixTime) } ! []
 
 
 type Msg

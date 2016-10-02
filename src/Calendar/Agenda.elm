@@ -20,28 +20,27 @@ eventsGroupedByDate config events =
         initEventGroup event =
             { date = config.start event, events = [ event ] }
 
-        buildEventGroup event eventGroups =
+        buildEventGroups event eventGroups =
             let
-                restOfEventGroups groups =
-                    case List.tail groups of
-                        Nothing ->
-                            []
+                eventStart =
+                    config.start event
 
-                        Just restOfGroups ->
-                            restOfGroups
+                isEventPartOfGroup eventGroup =
+                    eventStart
+                        |> Date.Extra.isBetween eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date)
             in
-                case List.head eventGroups of
-                    Nothing ->
+                case eventGroups of
+                    [] ->
                         [ initEventGroup event ]
 
-                    Just eventGroup ->
-                        if Date.Extra.isBetween eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date) (config.start event) then
-                            { eventGroup | events = event :: eventGroup.events } :: (restOfEventGroups eventGroups)
+                    eventGroup :: restOfEventGroups ->
+                        if isEventPartOfGroup eventGroup then
+                            { eventGroup | events = event :: eventGroup.events } :: restOfEventGroups
                         else
                             initEventGroup event :: eventGroups
     in
         List.sortBy (Date.toTime << config.start) events
-            |> List.foldr buildEventGroup []
+            |> List.foldr buildEventGroups []
 
 
 view : ViewConfig event -> List event -> Date -> Html msg
@@ -51,7 +50,8 @@ view config events date =
             eventsGroupedByDate config events
 
         isDateInMonth eventsDate =
-            Date.Extra.isBetween (Date.Extra.floor Date.Extra.Month date) (Date.Extra.ceiling Date.Extra.Month date) eventsDate
+            eventsDate
+                |> Date.Extra.isBetween (Date.Extra.floor Date.Extra.Month date) (Date.Extra.ceiling Date.Extra.Month date)
 
         filteredEventsByMonth =
             List.filter (isDateInMonth << .date) groupedEvents
@@ -83,7 +83,7 @@ viewAgendaDay config eventGroup =
 
 viewAgendaTimes : ViewConfig event -> List event -> Html msg
 viewAgendaTimes config events =
-    div []
+    div [ class "elm-calendar--agenda-times" ]
         (List.map (viewEventAndTime config) events)
 
 

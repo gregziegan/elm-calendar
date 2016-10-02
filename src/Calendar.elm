@@ -2,10 +2,11 @@ module Calendar
     exposing
         ( init
         , State
+        , TimeSpan(..)
         , Msg
         , update
         , page
-        , changeTimespan
+        , changeTimeSpan
         , view
         , viewConfig
         , ViewConfig
@@ -21,10 +22,10 @@ module Calendar
 Hey it's a calendar!
 
 # Definition
-@docs init, State
+@docs init, State, TimeSpan
 
 # Update
-@docs Msg, update, page, changeTimespan, eventConfig, EventConfig, timeSlotConfig, TimeSlotConfig, subscriptions
+@docs Msg, update, page, changeTimeSpan, eventConfig, EventConfig, timeSlotConfig, TimeSlotConfig, subscriptions
 
 # View
 @docs view, viewConfig, ViewConfig
@@ -33,23 +34,32 @@ Hey it's a calendar!
 import Html exposing (..)
 import Date exposing (Date)
 import Config
-import Helpers
 import Calendar.Calendar as Internal
 import Calendar.Msg
 import Html.App as Html
+import Calendar.Msg as InternalMsg
 
 
 {-| Create the calendar
 -}
-init : String -> Date -> State
-init timespan viewing =
-    State <| Internal.init timespan viewing
+init : TimeSpan -> Date -> State
+init timeSpan viewing =
+    State <| Internal.init (toInternalTimespan timeSpan) viewing
 
 
 {-| I won't tell you what's in here
 -}
 type State
     = State Internal.State
+
+
+{-| All the time spans
+-}
+type TimeSpan
+    = Month
+    | Week
+    | Day
+    | Agenda
 
 
 {-| Somehow update plz
@@ -78,9 +88,9 @@ page step (State state) =
 
 {-| Change between views like Month, Week, Day, etc.
 -}
-changeTimespan : Helpers.TimeSpan -> State -> State
-changeTimespan timespan (State state) =
-    State <| Internal.changeTimespan timespan state
+changeTimeSpan : TimeSpan -> State -> State
+changeTimeSpan timeSpan (State state) =
+    State <| Internal.changeTimeSpan (toInternalTimespan timeSpan) state
 
 
 {-| Show me the money
@@ -175,3 +185,19 @@ eventConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDr
 subscriptions : State -> Sub Msg
 subscriptions (State state) =
     Sub.map Internal (Internal.subscriptions state)
+
+
+toInternalTimespan : TimeSpan -> InternalMsg.TimeSpan
+toInternalTimespan timeSpan =
+    case timeSpan of
+        Month ->
+            InternalMsg.Month
+
+        Week ->
+            InternalMsg.Week
+
+        Day ->
+            InternalMsg.Day
+
+        Agenda ->
+            InternalMsg.Agenda

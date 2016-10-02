@@ -10,13 +10,12 @@ import Calendar.Agenda as Agenda
 import Calendar.Day as Day
 import Calendar.Month as Month
 import Calendar.Week as Week
-import Helpers exposing (TimeSpan(..))
-import Calendar.Msg exposing (Msg(..))
+import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Mouse
 
 
 type alias State =
-    { timespan : String
+    { timeSpan : TimeSpan
     , viewing : Date
     , dragState : Maybe Drag
     }
@@ -34,9 +33,9 @@ type DragKind
     | TimeSlot Date
 
 
-init : String -> Date -> State
-init timespan viewing =
-    { timespan = timespan
+init : TimeSpan -> Date -> State
+init timeSpan viewing =
+    { timeSpan = timeSpan
     , viewing = viewing
     , dragState = Nothing
     }
@@ -57,9 +56,9 @@ update eventConfig timeSlotConfig msg state =
             , Nothing
             )
 
-        ChangeTimeSpan timespan ->
+        ChangeTimeSpan timeSpan ->
             ( state
-                |> changeTimespan timespan
+                |> changeTimeSpan timeSpan
             , Nothing
             )
 
@@ -127,13 +126,10 @@ update eventConfig timeSlotConfig msg state =
 page : Int -> State -> State
 page step state =
     let
-        { timespan, viewing } =
+        { timeSpan, viewing } =
             state
-
-        timespanType =
-            Helpers.toTimeSpan timespan
     in
-        case timespanType of
+        case timeSpan of
             Week ->
                 { state | viewing = Date.Extra.add Date.Extra.Week step viewing }
 
@@ -144,19 +140,16 @@ page step state =
                 { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
 
 
-changeTimespan : Helpers.TimeSpan -> State -> State
-changeTimespan timespan state =
-    { state | timespan = Helpers.fromTimeSpan timespan }
+changeTimeSpan : TimeSpan -> State -> State
+changeTimeSpan timeSpan state =
+    { state | timeSpan = timeSpan }
 
 
 view : ViewConfig event -> List event -> State -> Html Msg
-view config events { viewing, timespan } =
+view config events { viewing, timeSpan } =
     let
-        timespanType =
-            Helpers.toTimeSpan timespan
-
         calendarView =
-            case timespanType of
+            case timeSpan of
                 Month ->
                     Month.view config events viewing
 
@@ -170,17 +163,17 @@ view config events { viewing, timespan } =
                     Agenda.view config events viewing
     in
         div [ class "elm-calendar--calendar" ]
-            [ viewToolbar viewing timespanType
+            [ viewToolbar viewing timeSpan
             , calendarView
             ]
 
 
 viewToolbar : Date -> TimeSpan -> Html Msg
-viewToolbar viewing timespan =
+viewToolbar viewing timeSpan =
     div [ class "elm-calendar--toolbar" ]
         [ viewPagination
         , viewTitle viewing
-        , viewTimespanSelection timespan
+        , viewTimeSpanSelection timeSpan
         ]
 
 
@@ -198,8 +191,8 @@ viewPagination =
         ]
 
 
-viewTimespanSelection : TimeSpan -> Html Msg
-viewTimespanSelection timespan =
+viewTimeSpanSelection : TimeSpan -> Html Msg
+viewTimeSpanSelection timeSpan =
     div []
         [ button [ class "elm-calendar--button", onClick (ChangeTimeSpan Month) ] [ text "Month" ]
         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
