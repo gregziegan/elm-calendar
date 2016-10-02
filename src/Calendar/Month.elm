@@ -106,42 +106,30 @@ eventWeekStyles eventWithinWeek =
 viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (List (Html msg))
 viewWeekEvent config week event =
     let
-        cellWidth =
-            (100.0 / 7)
+        eventStart =
+            config.start event
 
-        offsetLength =
-            cellWidth * (toFloat <| (Date.Extra.weekdayNumber (config.start event)) % 7)
-
-        offsetPercentage =
-            (toString offsetLength) ++ "%"
-
-        styleRowSegment widthPercentage =
-            style
-                [ ( "flex-basis", widthPercentage )
-                , ( "max-width", widthPercentage )
-                ]
-
-        rowSegment widthPercentage children =
-            div [ styleRowSegment widthPercentage ] children
+        eventEnd =
+            config.end event
 
         begWeek =
-            Maybe.withDefault (config.start event) <| List.head <| week
+            Maybe.withDefault eventStart <| List.head <| week
 
         endWeek =
-            Maybe.withDefault (config.end event) <| List.head <| List.reverse week
+            Maybe.withDefault eventEnd <| List.head <| List.reverse week
 
         startsThisWeek =
-            Date.Extra.isBetween begWeek endWeek (config.start event)
+            Date.Extra.isBetween begWeek endWeek eventStart
 
         endsThisWeek =
-            Date.Extra.isBetween begWeek endWeek (config.end event)
+            Date.Extra.isBetween begWeek endWeek eventEnd
 
         startsWeeksPrior =
-            Date.Extra.diff Date.Extra.Millisecond (config.start event) begWeek
+            Date.Extra.diff Date.Extra.Millisecond eventStart begWeek
                 |> (>) 0
 
         endsWeeksAfter =
-            Date.Extra.diff Date.Extra.Millisecond endWeek (config.end event)
+            Date.Extra.diff Date.Extra.Millisecond endWeek eventEnd
                 |> (>) 0
 
         maybeEventOnDate =
@@ -161,13 +149,13 @@ viewWeekEvent config week event =
                 * (toFloat
                     <| case eventWithinWeek of
                         StartsAndEnds ->
-                            Date.Extra.diff Date.Extra.Day (config.start event) (config.end event) + 1
+                            Date.Extra.diff Date.Extra.Day eventStart eventEnd + 1
 
                         ContinuesAfter ->
-                            7 - (Date.Extra.weekdayNumber <| config.start event) + 1
+                            7 - (Date.Extra.weekdayNumber eventStart) + 1
 
                         ContinuesPrior ->
-                            7 - (Date.Extra.weekdayNumber <| config.end event) + 1
+                            7 - (Date.Extra.weekdayNumber eventEnd) + 1
 
                         ContinuesAfterAndPrior ->
                             7
@@ -181,9 +169,37 @@ viewWeekEvent config week event =
                 [ div [ class "elm-calendar--month-event-content" ] [ text <| config.title event ] ]
 
         viewEvent eventWithinWeek =
-            if offsetLength > 0 then
-                [ rowSegment offsetPercentage [], rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment eventWithinWeek ] ]
+            if offsetLength eventStart > 0 then
+                [ rowSegment (offsetPercentage eventStart) [], rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment eventWithinWeek ] ]
             else
                 [ rowSegment (eventWidthPercentage eventWithinWeek) [ eventSegment eventWithinWeek ] ]
     in
         Maybe.map viewEvent maybeEventOnDate
+
+
+cellWidth : Float
+cellWidth =
+    (100.0 / 7)
+
+
+offsetLength : Date -> Float
+offsetLength date =
+    cellWidth * (toFloat <| ((Date.Extra.weekdayNumber date) % 7))
+
+
+offsetPercentage : Date -> String
+offsetPercentage date =
+    (toString <| offsetLength date) ++ "%"
+
+
+styleRowSegment : String -> Html.Attribute msg
+styleRowSegment widthPercentage =
+    style
+        [ ( "flex-basis", widthPercentage )
+        , ( "max-width", widthPercentage )
+        ]
+
+
+rowSegment : String -> List (Html msg) -> Html msg
+rowSegment widthPercentage children =
+    div [ styleRowSegment widthPercentage ] children
