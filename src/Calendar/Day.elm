@@ -108,8 +108,25 @@ viewDayEvents config events day =
 viewDayEvent : ViewConfig event -> Date -> event -> Maybe (Html Msg)
 viewDayEvent config day event =
     let
+        startOfToday =
+            Date.Extra.floor Date.Extra.Day day
+
+        endOfToday =
+            Date.Extra.ceiling Date.Extra.Day day
+
+        eventStartsAfterToday =
+            Date.Extra.diff Date.Extra.Millisecond (config.start event) endOfToday
+                |> (>) 0
+
+        eventEndsBeforeToday =
+            Date.Extra.diff Date.Extra.Millisecond startOfToday (config.end event)
+                |> (>) 0
+
         maybeEventOnDate =
-            eventWithinRange (config.start event) (config.end event) Date.Extra.Day (Helpers.hours day)
+            if eventEndsBeforeToday || eventStartsAfterToday then
+                Nothing
+            else
+                eventWithinRange (config.start event) (config.end event) Date.Extra.Day (Helpers.hours day)
     in
         Maybe.map (Event.viewDayEvent config event) maybeEventOnDate
 
