@@ -3,7 +3,7 @@ module Calendar.Week exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
-import Calendar.Day exposing (..)
+import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDate, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
 import Calendar.Msg exposing (Msg)
 import Config exposing (ViewConfig)
 import Helpers
@@ -11,18 +11,31 @@ import Helpers
 
 viewWeekContent : ViewConfig event -> List event -> Date -> List Date -> Html Msg
 viewWeekContent config events viewing days =
-    div [ class "elm-calendar--week-content" ]
-        ([ viewTimeGutter viewing ] ++ (List.map viewWeekDay days))
+    let
+        timeGutter =
+            viewTimeGutter viewing
+
+        weekDays =
+            List.map (viewWeekDay config events) days
+    in
+        div [ class "elm-calendar--week-content" ]
+            (timeGutter :: weekDays)
 
 
-viewWeekDay : Date -> Html Msg
-viewWeekDay day =
+viewWeekDay : ViewConfig event -> List event -> Date -> Html Msg
+viewWeekDay config events day =
     let
         numToDaySlotView _ =
             viewDaySlotGroup <| Date.fromTime 0
+
+        viewDaySlots =
+            List.map numToDaySlotView [1..24]
+
+        dayEvents =
+            (viewDayEvents config events day)
     in
         div [ class "elm-calendar--day" ]
-            (List.map numToDaySlotView [1..24])
+            (viewDaySlots ++ dayEvents)
 
 
 view : ViewConfig event -> List event -> Date -> Html Msg
