@@ -18,11 +18,9 @@ view config events day =
     div [ class "elm-calendar--day" ]
         [ viewDayHeader day
         , div [ class "elm-calendar--day-content" ]
-            ([ viewTimeGutter day
-             , viewDaySlot day
-             ]
-                ++ viewDayEvents config events day
-            )
+            [ viewTimeGutter day
+            , viewDaySlot config events day
+            ]
         ]
 
 
@@ -70,10 +68,11 @@ viewHourSlot date =
         [ span [ class "elm-calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
 
 
-viewDaySlot : Date -> Html Msg
-viewDaySlot day =
+viewDaySlot : ViewConfig event -> List event -> Date -> Html Msg
+viewDaySlot config events day =
     Helpers.hours day
         |> List.map viewDaySlotGroup
+        |> (flip (++)) (viewDayEvents config events day)
         |> div [ class "elm-calendar--day-slot" ]
 
 

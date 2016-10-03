@@ -8,7 +8,7 @@ import Date.Extra.Facts
 import Config exposing (ViewConfig)
 import Helpers
 import Calendar.Msg exposing (Msg)
-import Calendar.Event as Event exposing (eventStyles, eventWithinRange)
+import Calendar.Event as Event exposing (eventWithinRange)
 
 
 view : ViewConfig event -> List event -> Date -> Html Msg

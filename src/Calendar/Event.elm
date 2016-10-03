@@ -5,11 +5,10 @@ import Date.Extra
 import Html exposing (..)
 import Html.Attributes exposing (class, style)
 import Html.Events exposing (..)
-import Calendar.Msg exposing (Msg(..))
+import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Config exposing (ViewConfig)
 import Json.Decode as Json
 import Mouse
-import Helpers
 
 
 type EventRange
@@ -54,20 +53,44 @@ eventWithinRange start end interval dates =
             Nothing
 
 
-eventStyles : EventRange -> Html.Attribute Msg
-eventStyles eventRange =
-    case eventRange of
-        StartsAndEnds ->
-            class "elm-calendar--event elm-calendar--event-starts-and-ends"
+eventStyling : ViewConfig event -> event -> EventRange -> TimeSpan -> List (Html.Attribute Msg)
+eventStyling config event eventRange timeSpan =
+    let
+        eventStart =
+            config.start event
 
-        ContinuesAfter ->
-            class "elm-calendar--event elm-calendar--event-continues-after"
+        eventEnd =
+            config.end event
 
-        ContinuesPrior ->
-            class "elm-calendar--event elm-calendar--event-continues-prior"
+        classes =
+            case eventRange of
+                StartsAndEnds ->
+                    class "elm-calendar--event elm-calendar--event-starts-and-ends"
 
-        ContinuesAfterAndPrior ->
-            class "elm-calendar--event"
+                ContinuesAfter ->
+                    class "elm-calendar--event elm-calendar--event-continues-after"
+
+                ContinuesPrior ->
+                    class "elm-calendar--event elm-calendar--event-continues-prior"
+
+                ContinuesAfterAndPrior ->
+                    class "elm-calendar--event"
+
+        styles =
+            case timeSpan of
+                Month ->
+                    style []
+
+                Week ->
+                    style []
+
+                Day ->
+                    styleDayEvent eventStart eventEnd
+
+                Agenda ->
+                    style []
+    in
+        [ classes, styles ]
 
 
 viewMonthEvent : ViewConfig event -> event -> EventRange -> List (Html Msg)
@@ -103,30 +126,60 @@ viewMonthEvent config event eventRange =
     in
         if offsetLength eventStart > 0 then
             [ rowSegment (offsetPercentage eventStart) []
-            , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange ]
+            , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ]
             ]
         else
-            [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange ] ]
+            [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ] ]
+
+
+(=>) : a -> b -> ( a, b )
+(=>) =
+    (,)
+
+
+styleDayEvent : Date -> Date -> Html.Attribute Msg
+styleDayEvent start end =
+    let
+        startPercent =
+            100 * (Date.Extra.fractionalDay start)
+
+        endPercent =
+            100 * (Date.Extra.fractionalDay end)
+
+        height =
+            (toString <| endPercent - startPercent) ++ "%"
+
+        startPercentage =
+            (toString startPercent) ++ "%"
+    in
+        style
+            [ "top" => startPercentage
+            , "height" => height
+            , "left" => "0%"
+            , "width" => "90%"
+            , "position" => "absolute"
+            ]
 
 
 viewDayEvent : ViewConfig event -> event -> EventRange -> Html Msg
 viewDayEvent config event eventRange =
-    eventSegment config event eventRange
+    eventSegment config event eventRange Day
 
 
-eventSegment : ViewConfig event -> event -> EventRange -> Html Msg
-eventSegment config event eventRange =
+eventSegment : ViewConfig event -> event -> EventRange -> TimeSpan -> Html Msg
+eventSegment config event eventRange timeSpan =
     let
         eventId =
             config.toId event
     in
         div
-            [ eventStyles eventRange
-            , onClick <| EventClick eventId
-            , onMouseEnter <| EventMouseEnter eventId
-            , onMouseLeave <| EventMouseLeave eventId
-            , on "mousedown" <| Json.map (EventDragStart eventId) Mouse.position
-            ]
+            ([ onClick <| EventClick eventId
+             , onMouseEnter <| EventMouseEnter eventId
+             , onMouseLeave <| EventMouseLeave eventId
+             , on "mousedown" <| Json.map (EventDragStart eventId) Mouse.position
+             ]
+                ++ eventStyling config event eventRange timeSpan
+            )
             [ div [ class "elm-calendar--event-content" ]
                 [ text <| config.title event ]
             ]

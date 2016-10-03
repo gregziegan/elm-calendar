@@ -7,6 +7,7 @@
 .elm-calendar--calendar {
   display: flex;
   flex-direction: column;
+  width: 1200px;
   align-items: center;
 }
 
@@ -76,14 +77,13 @@
 .elm-calendar--column {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .elm-calendar--week {
   display: flex;
   flex-flow: column nowrap;
-  width: 924px;
   border: 1px solid #DDD;
-  min-width: 0px;
 }
 
 .elm-calendar--week-content {
@@ -96,7 +96,6 @@
 .elm-calendar--month {
   display: flex;
   flex-direction: column;
-  width: 1200px;
   height: 800px;
   position: relative;
   border: 1px solid #DDD;
@@ -133,7 +132,6 @@
 }
 
 .elm-calendar--all-day {
-  width: 120px;
   height: 48px;
 }
 
@@ -144,19 +142,21 @@
 
 .elm-calendar--day-slot {
   border-bottom: 1px solid #f7f7f7;
-  width: 120px;
+  flex-basis: 100%;
+  max-width: 100%;
 }
 
 .elm-calendar--day {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .elm-calendar--agenda {
   display: flex;
   flex-flow: column nowrap;
-  width: 924px;
   border: 1px solid #DDD;
+  width: 100%;
 }
 
 .elm-calendar--agenda-header {
