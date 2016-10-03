@@ -17,6 +17,10 @@
   text-align: center;
 }
 
+.elm-calendar--day-header {
+
+}
+
 .elm-calendar--month-row {
   display: flex;
   flex-direction: column;
@@ -144,6 +148,7 @@
   border-bottom: 1px solid #f7f7f7;
   flex-basis: 100%;
   max-width: 100%;
+  position: relative;
 }
 
 .elm-calendar--day {

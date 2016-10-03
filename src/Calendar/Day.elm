@@ -36,7 +36,7 @@ viewDate day =
 
 viewDayHeader : Date -> Html Msg
 viewDayHeader day =
-    div []
+    div [ class "elm-calendar--day-header" ]
         [ viewTimeGutterHeader
         , viewDate day
         ]
