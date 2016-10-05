@@ -7,10 +7,27 @@ A work in progress towards a reusable calendar widget.
 
 ## Contributing
 
+I'm using [elm-live](https://github.com/tomekwi/elm-live) for development, it's great!
+
+Install elm-live:
+
+`npm i -g elm-live`
+
+
+Install the calendar dependencies
 `elm-package install`
 
-`elm reactor`
+Install the dependencies for the examples
 
-Then edit `examples/src/Basic.elm` and/or `src/Calendar.elm`
+`cd examples`
+`elm-package install`
+
+Go back to the root directory
+
+`cd ..`
+
+And run `elm-live examples/src/<WhicheverExample>.elm --output=examples/elm.js --open --dir=examples`
+
+Then edit any of the files, and you should have some nice hot reloading!
 
 PRs welcome 😄
