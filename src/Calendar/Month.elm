@@ -8,7 +8,7 @@ import Date.Extra.Facts
 import Config exposing (ViewConfig)
 import Helpers
 import Calendar.Msg exposing (Msg)
-import Calendar.Event as Event exposing (eventWithinRange)
+import Calendar.Event as Event exposing (rangeDescription)
 
 
 view : ViewConfig event -> List event -> Date -> Html Msg
@@ -66,30 +66,24 @@ viewMonthRowContent config events week =
         datesRow =
             div [ class "elm-calendar--row" ] (List.map dateCell week)
 
-        maybeViewEvent event =
-            viewMonthWeekRow <| viewWeekEvent config week event
-
         eventRows =
-            List.filterMap maybeViewEvent events
+            List.filterMap (viewWeekEvent config week) events
                 |> List.take 3
     in
         div [ class "elm-calendar--month-week" ]
             (datesRow :: eventRows)
 
 
-viewMonthWeekRow : Maybe (List (Html Msg)) -> Maybe (Html Msg)
-viewMonthWeekRow maybeChildren =
-    let
-        nest children =
-            div [ class "elm-calendar--row" ] children
-    in
-        Maybe.map nest maybeChildren
+maybeAndThen : (a -> Maybe b) -> Maybe a -> Maybe b
+maybeAndThen =
+    flip Maybe.andThen
 
 
-viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (List (Html Msg))
+viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (Html Msg)
 viewWeekEvent config week event =
     let
-        maybeEventOnDate =
-            eventWithinRange (config.start event) (config.end event) Date.Extra.Week week
+        eventRange sunday =
+            rangeDescription (config.start event) (config.end event) Date.Extra.Sunday sunday
     in
-        Maybe.map (Event.viewMonthEvent config event) maybeEventOnDate
+        Maybe.map eventRange (List.head week)
+            |> maybeAndThen (Event.maybeViewMonthEvent config event)

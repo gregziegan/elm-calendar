@@ -10,7 +10,7 @@ import Helpers
 import Calendar.Msg exposing (Msg(..))
 import Json.Decode as Json
 import Mouse
-import Calendar.Event as Event exposing (eventWithinRange)
+import Calendar.Event as Event exposing (rangeDescription)
 
 
 view : ViewConfig event -> List event -> Date -> Html Msg
@@ -108,6 +108,9 @@ viewDayEvents config events day =
 viewDayEvent : ViewConfig event -> Date -> event -> Maybe (Html Msg)
 viewDayEvent config day event =
     let
+        theEvent =
+            Debug.log "event" event
+
         startOfToday =
             Date.Extra.floor Date.Extra.Day day
 
@@ -122,13 +125,10 @@ viewDayEvent config day event =
             Date.Extra.diff Date.Extra.Millisecond startOfToday (config.end event)
                 |> (>) 0
 
-        maybeEventOnDate =
-            if eventEndsBeforeToday || eventStartsAfterToday then
-                Nothing
-            else
-                eventWithinRange (config.start event) (config.end event) Date.Extra.Day (Helpers.hours day)
+        eventRange =
+            rangeDescription (config.start event) (config.end event) Date.Extra.Day day
     in
-        Maybe.map (Event.viewDayEvent config event) maybeEventOnDate
+        Event.maybeViewDayEvent config event eventRange
 
 
 viewAllDayCell : List Date -> Html Msg

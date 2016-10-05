@@ -25,11 +25,8 @@ viewWeekContent config events viewing days =
 viewWeekDay : ViewConfig event -> List event -> Date -> Html Msg
 viewWeekDay config events day =
     let
-        numToDaySlotView _ =
-            viewDaySlotGroup <| Date.fromTime 0
-
         viewDaySlots =
-            List.map numToDaySlotView [1..24]
+            List.map (viewDaySlotGroup << Date.fromTime) [1..24]
 
         dayEvents =
             (viewDayEvents config events day)

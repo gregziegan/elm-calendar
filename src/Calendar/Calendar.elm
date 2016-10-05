@@ -43,7 +43,8 @@ init timeSpan viewing =
 
 update : EventConfig msg -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
 update eventConfig timeSlotConfig msg state =
-    case Debug.log "msg" msg of
+    -- case Debug.log "msg" msg of
+    case msg of
         PageBack ->
             ( state
                 |> page -1
