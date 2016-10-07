@@ -163,10 +163,12 @@ view config events { viewing, timeSpan } =
                 Agenda ->
                     Agenda.view config events viewing
     in
-        div [ class "elm-calendar--calendar" ]
-            [ viewToolbar viewing timeSpan
-            , calendarView
-            ]
+        div [class "elm-calendar--container"] [
+          div [ class "elm-calendar--calendar" ]
+              [ viewToolbar viewing timeSpan
+              , calendarView
+              ]
+        ]
 
 
 viewToolbar : Date -> TimeSpan -> Html Msg
@@ -180,13 +182,13 @@ viewToolbar viewing timeSpan =
 
 viewTitle : Date -> Html Msg
 viewTitle viewing =
-    div []
+    div [ class "elm-calendar--month-title"]
         [ h2 [] [ text <| Date.Extra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
 viewPagination : Html Msg
 viewPagination =
-    div []
+    div [ class "elm-calendar--paginators" ]
         [ button [ class "elm-calendar--button", onClick PageBack ] [ text "back" ]
         , button [ class "elm-calendar--button", onClick PageForward ] [ text "next" ]
         ]
@@ -194,7 +196,7 @@ viewPagination =
 
 viewTimeSpanSelection : TimeSpan -> Html Msg
 viewTimeSpanSelection timeSpan =
-    div []
+    div [ class "elm-calendar--time-spans" ]
         [ button [ class "elm-calendar--button", onClick (ChangeTimeSpan Month) ] [ text "Month" ]
         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
