@@ -5,6 +5,7 @@ import Expect
 import Calendar.Event as Event exposing (EventRange(..))
 import Date exposing (..)
 import Date.Extra as Date exposing (..)
+import Helpers
 
 
 start : Date
@@ -85,9 +86,38 @@ weekRangeDescriptionTests =
         ]
 
 
-all : Test
-all =
+rangeDescriptionTests : Test
+rangeDescriptionTests =
     describe "range descriptions accurately describe how the event spans an interval"
         [ dayRangeDescriptionTests
         , weekRangeDescriptionTests
+        ]
+
+
+fullWeekStartSunday : List Date
+fullWeekStartSunday =
+    [ Date.fromCalendarDate 2016 Oct 2
+    , Date.fromCalendarDate 2016 Oct 3
+    , Date.fromCalendarDate 2016 Oct 4
+    , Date.fromCalendarDate 2016 Oct 5
+    , Date.fromCalendarDate 2016 Oct 6
+    , Date.fromCalendarDate 2016 Oct 7
+    , Date.fromCalendarDate 2016 Oct 8
+    ]
+
+
+helperTests : Test
+helperTests =
+    describe "test helper functions"
+        [ test "dayRangeOfWeek returns the correct day range from Sunday"
+            <| \() ->
+                Expect.equal fullWeekStartSunday (Helpers.dayRangeOfWeek start)
+        ]
+
+
+all : Test
+all =
+    describe "all tests"
+        [ rangeDescriptionTests
+        , helperTests
         ]
