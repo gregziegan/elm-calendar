@@ -159,6 +159,35 @@ octoberDatesByWeek =
     ]
 
 
+hoursInADay : List Date
+hoursInADay =
+    [ Date.fromParts 2016 Oct 4 0 0 0 0
+    , Date.fromParts 2016 Oct 4 1 0 0 0
+    , Date.fromParts 2016 Oct 4 2 0 0 0
+    , Date.fromParts 2016 Oct 4 3 0 0 0
+    , Date.fromParts 2016 Oct 4 4 0 0 0
+    , Date.fromParts 2016 Oct 4 5 0 0 0
+    , Date.fromParts 2016 Oct 4 6 0 0 0
+    , Date.fromParts 2016 Oct 4 7 0 0 0
+    , Date.fromParts 2016 Oct 4 8 0 0 0
+    , Date.fromParts 2016 Oct 4 9 0 0 0
+    , Date.fromParts 2016 Oct 4 10 0 0 0
+    , Date.fromParts 2016 Oct 4 11 0 0 0
+    , Date.fromParts 2016 Oct 4 12 0 0 0
+    , Date.fromParts 2016 Oct 4 13 0 0 0
+    , Date.fromParts 2016 Oct 4 14 0 0 0
+    , Date.fromParts 2016 Oct 4 15 0 0 0
+    , Date.fromParts 2016 Oct 4 16 0 0 0
+    , Date.fromParts 2016 Oct 4 17 0 0 0
+    , Date.fromParts 2016 Oct 4 18 0 0 0
+    , Date.fromParts 2016 Oct 4 19 0 0 0
+    , Date.fromParts 2016 Oct 4 20 0 0 0
+    , Date.fromParts 2016 Oct 4 21 0 0 0
+    , Date.fromParts 2016 Oct 4 22 0 0 0
+    , Date.fromParts 2016 Oct 4 23 0 0 0
+    ]
+
+
 helperTests : Test
 helperTests =
     describe "test helper functions"
@@ -168,6 +197,9 @@ helperTests =
         , test "weekRangesFromMonth returns month dates in weeks w/ days before/prior"
             <| \() ->
                 Expect.equal octoberDatesByWeek (Helpers.weekRangesFromMonth 2016 Oct)
+        , test "hours in a day"
+            <| \() ->
+                Expect.equal hoursInADay (Helpers.hours start)
         ]
 
 
