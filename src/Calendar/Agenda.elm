@@ -55,40 +55,54 @@ view config events date =
 
         filteredEventsByMonth =
             List.filter (isDateInMonth << .date) groupedEvents
+
+        getAgendaRowView eventGroup =
+            case eventGroup.events of
+                [] ->
+                    []
+
+                firstEvent :: restOfEvents ->
+                    viewAgendaRowWithDate config eventGroup firstEvent :: (List.map (viewAgendaRow config) restOfEvents)
     in
-        div [ class "elm-calendar--agenda" ]
-            (viewAgendaHeader :: List.map (viewAgendaDay config) filteredEventsByMonth)
+        table [ class "elm-calendar--agenda" ]
+            [ viewAgendaHeader
+            , tbody []
+                (List.map getAgendaRowView filteredEventsByMonth
+                    |> List.concat
+                )
+            ]
 
 
 viewAgendaHeader : Html msg
 viewAgendaHeader =
-    div [ class "elm-calendar--agenda-header" ]
-        [ div [ class "elm-calendar--header-cell" ] [ text "Date" ]
-        , div [ class "elm-calendar--header-cell" ] [ text "Time" ]
-        , div [ class "elm-calendar--header-cell" ] [ text "Event" ]
+    thead [ class "elm-calendar--agenda-header" ]
+        [ th [ class "elm-calendar--header-cell" ] [ text "Date" ]
+        , th [ class "elm-calendar--header-cell" ] [ text "Time" ]
+        , th [ class "elm-calendar--header-cell" ] [ text "Event" ]
         ]
 
 
-viewAgendaDay : ViewConfig event -> EventGroup event -> Html msg
-viewAgendaDay config eventGroup =
+viewAgendaRowWithDate : ViewConfig event -> EventGroup event -> event -> Html msg
+viewAgendaRowWithDate config eventGroup event =
     let
         dateString =
             Date.Extra.toFormattedString "EE MM d" eventGroup.date
+
+        timeCell =
+            td [ class "elm-calendar--agenda-date-cell", rowspan (List.length eventGroup.events) ] [ text <| dateString ]
     in
-        div [ class "elm-calendar--agenda-day" ]
-            [ div [ class "elm-calendar--agenda-date-cell" ] [ text <| dateString ]
-            , viewAgendaTimes config eventGroup.events
-            ]
+        tr [ class "elm-calendar--agenda-day" ]
+            (timeCell :: viewTimeAndEvent config event)
 
 
-viewAgendaTimes : ViewConfig event -> List event -> Html msg
-viewAgendaTimes config events =
-    div [ class "elm-calendar--agenda-times" ]
-        (List.map (viewEventAndTime config) events)
+viewAgendaRow : ViewConfig event -> event -> Html msg
+viewAgendaRow config event =
+    tr [ class "elm-calendar--agenda-day" ]
+        (viewTimeAndEvent config event)
 
 
-viewEventAndTime : ViewConfig event -> event -> Html msg
-viewEventAndTime config event =
+viewTimeAndEvent : ViewConfig event -> event -> List (Html msg)
+viewTimeAndEvent config event =
     let
         startTime =
             Helpers.hourString <| config.start event
@@ -99,7 +113,6 @@ viewEventAndTime config event =
         timeRange =
             startTime ++ " - " ++ endTime
     in
-        div [ class "elm-calendar--row" ]
-            [ div [ class "elm-calendar--agenda-cell" ] [ text timeRange ]
-            , div [ class "elm-calendar--agenda-cell" ] [ text <| config.title event ]
-            ]
+        [ td [ class "elm-calendar--agenda-cell" ] [ text timeRange ]
+        , td [ class "elm-calendar--agenda-cell" ] [ text <| config.title event ]
+        ]
