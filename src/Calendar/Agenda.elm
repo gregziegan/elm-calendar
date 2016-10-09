@@ -18,19 +18,20 @@ eventsGroupedByDate : ViewConfig event -> List event -> List (EventGroup event)
 eventsGroupedByDate config events =
     let
         initEventGroup event =
-            { date = config.start event, events = [ event ] }
+            { date =
+                config.start event
+                    |> Date.Extra.floor Date.Extra.Day
+            , events = [ event ]
+            }
 
         buildEventGroups event eventGroups =
             let
                 eventStart =
                     config.start event
 
-                begDate date =
-                    Date.Extra.floor Date.Extra.Day date
-
                 isEventPartOfGroup eventGroup =
                     eventStart
-                        |> Date.Extra.isBetween (begDate eventGroup.date) (Date.Extra.add Date.Extra.Day 1 eventGroup.date)
+                        |> Date.Extra.isBetween eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date)
             in
                 case eventGroups of
                     [] ->

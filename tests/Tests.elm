@@ -7,6 +7,7 @@ import Date exposing (..)
 import Date.Extra as Date exposing (..)
 import Helpers
 import Fixtures exposing (start, end, viewing, dayPrior, dayAfter, weekPrior, weekAfter)
+import Calendar.Agenda as Agenda
 
 
 dayRangeDescriptionTests : Test
@@ -68,9 +69,19 @@ helperTests =
         ]
 
 
+agendaTests : Test
+agendaTests =
+    describe "test agenda display logic"
+        [ test "events are grouped properly"
+            <| \() ->
+                Expect.equal Fixtures.eventGroups (Agenda.eventsGroupedByDate Fixtures.config Fixtures.events)
+        ]
+
+
 all : Test
 all =
     describe "all tests"
         [ rangeDescriptionTests
         , helperTests
+        , agendaTests
         ]

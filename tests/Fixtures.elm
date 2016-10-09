@@ -131,3 +131,48 @@ hoursInADay =
     , fromParts 2016 Oct 4 22 0 0 0
     , fromParts 2016 Oct 4 23 0 0 0
     ]
+
+
+config =
+    { toId = .id
+    , title = .title
+    , start = .start
+    , end = .end
+    }
+
+
+eventOne =
+    { id = "brunch1", title = "Brunch w/ Friends", start = fromParts 2016 Oct 4 13 30 0 0, end = fromParts 2016 Oct 4 15 0 0 0 }
+
+
+eventTwo =
+    { id = "brunch2", title = "Brunch w/o Friends :(", start = fromParts 2016 Oct 5 13 30 0 0, end = fromParts 2016 Oct 5 14 10 0 0 }
+
+
+eventThree =
+    { id = "payingbills", title = "Paying Bills Alone", start = fromParts 2016 Oct 5 15 15 0 0, end = fromParts 2016 Oct 5 15 45 0 0 }
+
+
+eventFour =
+    { id = "conference", title = "A Tech Conference", start = fromParts 2016 Oct 18 9 0 0 0, end = fromParts 2016 Oct 21 4 0 0 0 }
+
+
+eventGroups =
+    [ { date = fromParts 2016 Oct 4 0 0 0 0
+      , events = [ eventOne ]
+      }
+    , { date = fromParts 2016 Oct 5 0 0 0 0
+      , events = [ eventTwo, eventThree ]
+      }
+    , { date = fromParts 2016 Oct 18 0 0 0 0
+      , events = [ eventFour ]
+      }
+    ]
+
+
+events =
+    [ eventOne
+    , eventTwo
+    , eventThree
+    , eventFour
+    ]
