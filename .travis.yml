@@ -8,7 +8,7 @@ cache:
     - tests/elm-stuff/build-artifacts
 
 install:
-  - npm install -g elm@$17.1.0 elm-test
+  - npm install -g elm elm-test
   - npm install
   - git clone https://github.com/NoRedInk/elm-ops-tooling
   - elm-ops-tooling/with_retry.rb elm package install --yes
