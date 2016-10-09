@@ -25,9 +25,12 @@ eventsGroupedByDate config events =
                 eventStart =
                     config.start event
 
+                begDate date =
+                    Date.Extra.floor Date.Extra.Day date
+
                 isEventPartOfGroup eventGroup =
                     eventStart
-                        |> Date.Extra.isBetween eventGroup.date (Date.Extra.add Date.Extra.Day 1 eventGroup.date)
+                        |> Date.Extra.isBetween (begDate eventGroup.date) (Date.Extra.add Date.Extra.Day 1 eventGroup.date)
             in
                 case eventGroups of
                     [] ->
@@ -66,7 +69,7 @@ view config events date =
     in
         table [ class "elm-calendar--agenda" ]
             [ viewAgendaHeader
-            , tbody []
+            , tbody [ class "elm-calendar--agenda-tbody" ]
                 (List.map getAgendaRowView filteredEventsByMonth
                     |> List.concat
                 )
@@ -76,9 +79,11 @@ view config events date =
 viewAgendaHeader : Html msg
 viewAgendaHeader =
     thead [ class "elm-calendar--agenda-header" ]
-        [ th [ class "elm-calendar--header-cell" ] [ text "Date" ]
-        , th [ class "elm-calendar--header-cell" ] [ text "Time" ]
-        , th [ class "elm-calendar--header-cell" ] [ text "Event" ]
+        [ tr []
+            [ th [ class "elm-calendar--header-cell" ] [ text "Date" ]
+            , th [ class "elm-calendar--header-cell" ] [ text "Time" ]
+            , th [ class "elm-calendar--header-cell" ] [ text "Event" ]
+            ]
         ]
 
 

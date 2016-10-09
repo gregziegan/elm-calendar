@@ -178,28 +178,30 @@
 }
 
 .elm-calendar--agenda {
-  display: flex;
-  flex-flow: column nowrap;
   border: 1px solid #DDD;
   width: 100%;
 }
 
 .elm-calendar--agenda-header {
-  display: flex;
   border-bottom: 1px solid #DDD;
 }
 
+.elm-calendar--agenda-tbody {
+  border: 1px solid #DDD;
+}
+
 .elm-calendar--header-cell {
-  text-align: center;
-  border-left: 1px solid #DDD;
+  text-align: left;
+  padding: 3px 5px;
+  border-bottom: 1px solid #DDD;
 }
 
 .elm-calendar--agenda-day {
-  display: flex;
-  border-bottom: 1px solid #d7d7d7;
+  border-top: 1px solid #d7d7d7;
 }
 
 .elm-calendar--agenda-date-cell {
+  vertical-align: top;
   padding: 0 5px;
 }
 
