@@ -3,6 +3,7 @@ module Calendar.Week exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
+import Date.Extra
 import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDate, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
 import Calendar.Msg exposing (Msg)
 import Config exposing (ViewConfig)
@@ -25,14 +26,12 @@ viewWeekContent config events viewing days =
 viewWeekDay : ViewConfig event -> List event -> Date -> Html Msg
 viewWeekDay config events day =
     let
-        numToDaySlotView _ =
-            viewDaySlotGroup <| Date.fromTime 0
-
         viewDaySlots =
-            List.map numToDaySlotView [1..24]
+            List.map (viewDaySlotGroup << Date.fromTime) [1..24]
 
         dayEvents =
-            (viewDayEvents config events day)
+            Date.Extra.add Date.Extra.Millisecond 1 day
+                |> viewDayEvents config events
     in
         div [ class "elm-calendar--day" ]
             (viewDaySlots ++ dayEvents)

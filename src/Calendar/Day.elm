@@ -10,7 +10,7 @@ import Helpers
 import Calendar.Msg exposing (Msg(..))
 import Json.Decode as Json
 import Mouse
-import Calendar.Event as Event exposing (eventWithinRange)
+import Calendar.Event as Event exposing (rangeDescription)
 
 
 view : ViewConfig event -> List event -> Date -> Html Msg
@@ -28,7 +28,7 @@ viewDate : Date -> Html Msg
 viewDate day =
     let
         title day =
-            Date.Extra.toFormattedString "EE d/M" day
+            Date.Extra.toFormattedString "EE M/d" day
     in
         div [ class "elm-calendar--date-header" ]
             [ a [ class "elm-calendar--date", href "#" ] [ text <| title day ] ]
@@ -98,37 +98,16 @@ viewTimeSlot date =
 
 viewDayEvents : ViewConfig event -> List event -> Date -> List (Html Msg)
 viewDayEvents config events day =
-    let
-        maybeViewEvent event =
-            viewDayEvent config day event
-    in
-        List.filterMap maybeViewEvent events
+    List.filterMap (viewDayEvent config day) events
 
 
 viewDayEvent : ViewConfig event -> Date -> event -> Maybe (Html Msg)
 viewDayEvent config day event =
     let
-        startOfToday =
-            Date.Extra.floor Date.Extra.Day day
-
-        endOfToday =
-            Date.Extra.ceiling Date.Extra.Day day
-
-        eventStartsAfterToday =
-            Date.Extra.diff Date.Extra.Millisecond (config.start event) endOfToday
-                |> (>) 0
-
-        eventEndsBeforeToday =
-            Date.Extra.diff Date.Extra.Millisecond startOfToday (config.end event)
-                |> (>) 0
-
-        maybeEventOnDate =
-            if eventEndsBeforeToday || eventStartsAfterToday then
-                Nothing
-            else
-                eventWithinRange (config.start event) (config.end event) Date.Extra.Day (Helpers.hours day)
+        eventRange =
+            rangeDescription (config.start event) (config.end event) Date.Extra.Day day
     in
-        Maybe.map (Event.viewDayEvent config event) maybeEventOnDate
+        Event.maybeViewDayEvent config event eventRange
 
 
 viewAllDayCell : List Date -> Html Msg

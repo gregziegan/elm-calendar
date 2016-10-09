@@ -16,16 +16,18 @@ type EventRange
     | ContinuesAfter
     | ContinuesPrior
     | ContinuesAfterAndPrior
+    | ExistsOutside
 
 
-eventWithinRange : Date -> Date -> Date.Extra.Interval -> List Date -> Maybe EventRange
-eventWithinRange start end interval dates =
+rangeDescription : Date -> Date -> Date.Extra.Interval -> Date -> EventRange
+rangeDescription start end interval date =
     let
         begInterval =
-            Maybe.withDefault start <| List.head <| dates
+            Date.Extra.floor interval date
 
         endInterval =
-            Maybe.withDefault end <| List.head <| List.reverse dates
+            Date.Extra.ceiling interval date
+                |> Date.Extra.add Date.Extra.Millisecond -1
 
         startsThisInterval =
             Date.Extra.isBetween begInterval endInterval start
@@ -33,24 +35,24 @@ eventWithinRange start end interval dates =
         endsThisInterval =
             Date.Extra.isBetween begInterval endInterval end
 
-        startsIntervalPrior =
-            Date.Extra.diff Date.Extra.Millisecond start begInterval
+        startsBeforeInterval =
+            Date.Extra.diff Date.Extra.Millisecond begInterval start
                 |> (>) 0
 
-        endsIntervalAfter =
-            Date.Extra.diff Date.Extra.Millisecond endInterval end
+        endsAfterInterval =
+            Date.Extra.diff Date.Extra.Millisecond end endInterval
                 |> (>) 0
     in
         if startsThisInterval && endsThisInterval then
-            Just StartsAndEnds
-        else if startsIntervalPrior && endsIntervalAfter then
-            Just ContinuesAfterAndPrior
-        else if startsThisInterval && endsIntervalAfter then
-            Just ContinuesAfter
-        else if endsThisInterval && startsIntervalPrior then
-            Just ContinuesPrior
+            StartsAndEnds
+        else if startsBeforeInterval && endsAfterInterval then
+            ContinuesAfterAndPrior
+        else if startsThisInterval && endsAfterInterval then
+            ContinuesAfter
+        else if endsThisInterval && startsBeforeInterval then
+            ContinuesPrior
         else
-            Nothing
+            ExistsOutside
 
 
 eventStyling : ViewConfig event -> event -> EventRange -> TimeSpan -> List (Html.Attribute Msg)
@@ -76,6 +78,9 @@ eventStyling config event eventRange timeSpan =
                 ContinuesAfterAndPrior ->
                     class "elm-calendar--event"
 
+                ExistsOutside ->
+                    class ""
+
         styles =
             case timeSpan of
                 Month ->
@@ -93,7 +98,17 @@ eventStyling config event eventRange timeSpan =
         [ classes, styles ]
 
 
-viewMonthEvent : ViewConfig event -> event -> EventRange -> List (Html Msg)
+maybeViewMonthEvent : ViewConfig event -> event -> EventRange -> Maybe (Html Msg)
+maybeViewMonthEvent config event eventRange =
+    case eventRange of
+        ExistsOutside ->
+            Nothing
+
+        _ ->
+            Just <| viewMonthEvent config event eventRange
+
+
+viewMonthEvent : ViewConfig event -> event -> EventRange -> Html Msg
 viewMonthEvent config event eventRange =
     let
         eventStart =
@@ -116,6 +131,9 @@ viewMonthEvent config event eventRange =
                 ContinuesAfterAndPrior ->
                     7
 
+                ExistsOutside ->
+                    0
+
         eventWidthPercentage eventRange =
             (numDaysThisWeek
                 |> toFloat
@@ -125,11 +143,13 @@ viewMonthEvent config event eventRange =
                 ++ "%"
     in
         if offsetLength eventStart > 0 then
-            [ rowSegment (offsetPercentage eventStart) []
-            , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ]
-            ]
+            div [ class "elm-calendar--row" ]
+                [ rowSegment (offsetPercentage eventStart) []
+                , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ]
+                ]
         else
-            [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ] ]
+            div [ class "elm-calendar--row" ]
+                [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ] ]
 
 
 (=>) : a -> b -> ( a, b )
@@ -161,9 +181,14 @@ styleDayEvent start end =
             ]
 
 
-viewDayEvent : ViewConfig event -> event -> EventRange -> Html Msg
-viewDayEvent config event eventRange =
-    eventSegment config event eventRange Day
+maybeViewDayEvent : ViewConfig event -> event -> EventRange -> Maybe (Html Msg)
+maybeViewDayEvent config event eventRange =
+    case eventRange of
+        ExistsOutside ->
+            Nothing
+
+        _ ->
+            Just <| eventSegment config event eventRange Day
 
 
 eventSegment : ViewConfig event -> event -> EventRange -> TimeSpan -> Html Msg
