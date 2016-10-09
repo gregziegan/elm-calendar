@@ -98,30 +98,12 @@ viewTimeSlot date =
 
 viewDayEvents : ViewConfig event -> List event -> Date -> List (Html Msg)
 viewDayEvents config events day =
-    let
-        maybeViewEvent event =
-            viewDayEvent config day event
-    in
-        List.filterMap maybeViewEvent events
+    List.filterMap (viewDayEvent config day) events
 
 
 viewDayEvent : ViewConfig event -> Date -> event -> Maybe (Html Msg)
 viewDayEvent config day event =
     let
-        startOfToday =
-            Date.Extra.floor Date.Extra.Day day
-
-        endOfToday =
-            Date.Extra.ceiling Date.Extra.Day day
-
-        eventStartsAfterToday =
-            Date.Extra.diff Date.Extra.Millisecond (config.start event) endOfToday
-                |> (>) 0
-
-        eventEndsBeforeToday =
-            Date.Extra.diff Date.Extra.Millisecond startOfToday (config.end event)
-                |> (>) 0
-
         eventRange =
             rangeDescription (config.start event) (config.end event) Date.Extra.Day day
     in

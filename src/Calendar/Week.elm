@@ -39,7 +39,7 @@ view : ViewConfig event -> List event -> Date -> Html Msg
 view config events viewing =
     let
         weekRange =
-            Debug.log "weekRange" <| Helpers.dayRangeOfWeek viewing
+            Helpers.dayRangeOfWeek viewing
     in
         div [ class "elm-calendar--week" ]
             [ viewWeekHeader weekRange

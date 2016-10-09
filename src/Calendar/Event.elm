@@ -26,7 +26,9 @@ rangeDescription start end interval date =
             Date.Extra.floor interval date
 
         endInterval =
-            Date.Extra.ceiling interval date
+            Date.Extra.add interval 1 date
+                |> Date.Extra.ceiling interval
+                |> Date.Extra.add Date.Extra.Millisecond -1
 
         startsThisInterval =
             Date.Extra.isBetween begInterval endInterval start
