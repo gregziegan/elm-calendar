@@ -106,12 +106,68 @@ fullWeekStartSunday =
     ]
 
 
+octoberDatesByWeek : List (List Date)
+octoberDatesByWeek =
+    [ [ Date.fromCalendarDate 2016 Sep 25
+      , Date.fromCalendarDate 2016 Sep 26
+      , Date.fromCalendarDate 2016 Sep 27
+      , Date.fromCalendarDate 2016 Sep 28
+      , Date.fromCalendarDate 2016 Sep 29
+      , Date.fromCalendarDate 2016 Sep 30
+      , Date.fromCalendarDate 2016 Oct 1
+      ]
+    , [ Date.fromCalendarDate 2016 Oct 2
+      , Date.fromCalendarDate 2016 Oct 3
+      , Date.fromCalendarDate 2016 Oct 4
+      , Date.fromCalendarDate 2016 Oct 5
+      , Date.fromCalendarDate 2016 Oct 6
+      , Date.fromCalendarDate 2016 Oct 7
+      , Date.fromCalendarDate 2016 Oct 8
+      ]
+    , [ Date.fromCalendarDate 2016 Oct 9
+      , Date.fromCalendarDate 2016 Oct 10
+      , Date.fromCalendarDate 2016 Oct 11
+      , Date.fromCalendarDate 2016 Oct 12
+      , Date.fromCalendarDate 2016 Oct 13
+      , Date.fromCalendarDate 2016 Oct 14
+      , Date.fromCalendarDate 2016 Oct 15
+      ]
+    , [ Date.fromCalendarDate 2016 Oct 16
+      , Date.fromCalendarDate 2016 Oct 17
+      , Date.fromCalendarDate 2016 Oct 18
+      , Date.fromCalendarDate 2016 Oct 19
+      , Date.fromCalendarDate 2016 Oct 20
+      , Date.fromCalendarDate 2016 Oct 21
+      , Date.fromCalendarDate 2016 Oct 22
+      ]
+    , [ Date.fromCalendarDate 2016 Oct 23
+      , Date.fromCalendarDate 2016 Oct 24
+      , Date.fromCalendarDate 2016 Oct 25
+      , Date.fromCalendarDate 2016 Oct 26
+      , Date.fromCalendarDate 2016 Oct 27
+      , Date.fromCalendarDate 2016 Oct 28
+      , Date.fromCalendarDate 2016 Oct 29
+      ]
+    , [ Date.fromCalendarDate 2016 Oct 30
+      , Date.fromCalendarDate 2016 Oct 31
+      , Date.fromCalendarDate 2016 Nov 1
+      , Date.fromCalendarDate 2016 Nov 2
+      , Date.fromCalendarDate 2016 Nov 3
+      , Date.fromCalendarDate 2016 Nov 4
+      , Date.fromCalendarDate 2016 Nov 5
+      ]
+    ]
+
+
 helperTests : Test
 helperTests =
     describe "test helper functions"
         [ test "dayRangeOfWeek returns the correct day range from Sunday"
             <| \() ->
                 Expect.equal fullWeekStartSunday (Helpers.dayRangeOfWeek start)
+        , test "weekRangesFromMonth returns month dates in weeks w/ days before/prior"
+            <| \() ->
+                Expect.equal octoberDatesByWeek (Helpers.weekRangesFromMonth 2016 Oct)
         ]
 
 
