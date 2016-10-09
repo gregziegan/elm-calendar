@@ -1,11 +1,12 @@
 {
     "version": "1.0.0",
-    "summary": "Sample Elm Test",
-    "repository": "https://github.com/user/project.git",
+    "summary": "Tests for Elm Calendar",
+    "repository": "https://github.com/thebritican/elm-calendar.git",
     "license": "BSD-3-Clause",
     "source-directories": [
         ".",
-        "../src"
+        "../src",
+        "../fixtures"
     ],
     "exposed-modules": [],
     "dependencies": {

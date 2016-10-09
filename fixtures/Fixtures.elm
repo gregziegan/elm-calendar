@@ -133,11 +133,19 @@ hoursInADay =
     ]
 
 
-config =
+viewConfig =
     { toId = .id
     , title = .title
     , start = .start
     , end = .end
+    }
+
+
+type alias Event =
+    { id : String
+    , title : String
+    , start : Date
+    , end : Date
     }
 
 

@@ -74,7 +74,7 @@ agendaTests =
     describe "test agenda display logic"
         [ test "events are grouped properly"
             <| \() ->
-                Expect.equal Fixtures.eventGroups (Agenda.eventsGroupedByDate Fixtures.config Fixtures.events)
+                Expect.equal Fixtures.eventGroups (Agenda.eventsGroupedByDate Fixtures.viewConfig Fixtures.events)
         ]
 
 
