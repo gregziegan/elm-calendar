@@ -43,11 +43,7 @@ weekRangesFromMonth year month =
 
 dayRangeOfWeek : Date -> List Date
 dayRangeOfWeek date =
-    let
-        firstOfWeek =
-            Date.Extra.floor Date.Extra.Week date
-    in
-        Date.Extra.range Date.Extra.Day
-            1
-            (Date.Extra.floor Date.Extra.Sunday firstOfWeek)
-            (Date.Extra.ceiling Date.Extra.Sunday firstOfWeek)
+    Date.Extra.range Date.Extra.Day
+        1
+        (Date.Extra.floor Date.Extra.Sunday date)
+        (Date.Extra.ceiling Date.Extra.Sunday date)

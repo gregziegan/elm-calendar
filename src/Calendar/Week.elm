@@ -29,7 +29,7 @@ viewWeekDay config events day =
             List.map (viewDaySlotGroup << Date.fromTime) [1..24]
 
         dayEvents =
-            (viewDayEvents config events day)
+            viewDayEvents config events day
     in
         div [ class "elm-calendar--day" ]
             (viewDaySlots ++ dayEvents)
@@ -39,7 +39,7 @@ view : ViewConfig event -> List event -> Date -> Html Msg
 view config events viewing =
     let
         weekRange =
-            Helpers.dayRangeOfWeek viewing
+            Debug.log "weekRange" <| Helpers.dayRangeOfWeek viewing
     in
         div [ class "elm-calendar--week" ]
             [ viewWeekHeader weekRange
