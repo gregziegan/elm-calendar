@@ -13,14 +13,11 @@ hourString date =
 hours : Date -> List Date
 hours date =
     let
-        workingDate =
-            Date.Extra.add Date.Extra.Day -1 date
-
         midnight =
-            Date.Extra.floor Date.Extra.Day workingDate
+            Date.Extra.floor Date.Extra.Day date
 
         lastHour =
-            Date.Extra.ceiling Date.Extra.Day workingDate
+            Date.Extra.ceiling Date.Extra.Day date
     in
         Date.Extra.range Date.Extra.Hour 1 midnight lastHour
 
