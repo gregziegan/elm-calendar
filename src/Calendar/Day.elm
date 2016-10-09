@@ -108,9 +108,6 @@ viewDayEvents config events day =
 viewDayEvent : ViewConfig event -> Date -> event -> Maybe (Html Msg)
 viewDayEvent config day event =
     let
-        theEvent =
-            Debug.log "event" event
-
         startOfToday =
             Date.Extra.floor Date.Extra.Day day
 

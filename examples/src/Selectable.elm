@@ -28,12 +28,15 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    { calendarState = Calendar.init Calendar.Month (Date.fromTime someUnixTime) } ! []
+    ( { calendarState = Calendar.init Calendar.Month (Date.fromTime someUnixTime) }, Cmd.none )
 
 
 type Msg
     = SetCalendarState Calendar.Msg
-    | SelectDate Date
+
+
+type CalendarMsg
+    = SelectDate Date
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -49,11 +52,15 @@ update msg model =
             in
                 case maybeMsg of
                     Nothing ->
-                        newModel ! []
+                        ( newModel, Cmd.none )
 
                     Just updateMsg ->
-                        update updateMsg newModel
+                        updateCalendar updateMsg newModel
 
+
+updateCalendar : CalendarMsg -> Model -> ( Model, Cmd Msg )
+updateCalendar msg model =
+    case msg of
         SelectDate date ->
             let
                 whatDate =
@@ -78,7 +85,7 @@ viewConfig =
         }
 
 
-eventConfig : Calendar.EventConfig Msg
+eventConfig : Calendar.EventConfig CalendarMsg
 eventConfig =
     Calendar.eventConfig
         { onClick = \_ -> Nothing
@@ -90,7 +97,7 @@ eventConfig =
         }
 
 
-timeSlotConfig : Calendar.TimeSlotConfig Msg
+timeSlotConfig : Calendar.TimeSlotConfig CalendarMsg
 timeSlotConfig =
     Calendar.timeSlotConfig
         { onClick = \date -> Just <| SelectDate date
