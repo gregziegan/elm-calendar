@@ -27,7 +27,8 @@ viewWeekDay : ViewConfig event -> List event -> Date -> Html Msg
 viewWeekDay config events day =
     let
         viewDaySlots =
-            List.map (viewDaySlotGroup << Date.fromTime) [1..24]
+            Helpers.hours day
+                |> List.map viewDaySlotGroup
 
         dayEvents =
             Date.Extra.add Date.Extra.Millisecond 1 day

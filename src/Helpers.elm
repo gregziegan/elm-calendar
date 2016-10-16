@@ -13,11 +13,20 @@ hourString date =
 hours : Date -> List Date
 hours date =
     let
+        checkMidnightBoundary date =
+            if Date.Extra.fractionalDay date == 0 then
+                Date.Extra.add Date.Extra.Millisecond 1 date
+            else
+                date
+
+        day =
+            checkMidnightBoundary date
+
         midnight =
-            Date.Extra.floor Date.Extra.Day date
+            Date.Extra.floor Date.Extra.Day day
 
         lastHour =
-            Date.Extra.ceiling Date.Extra.Day date
+            Date.Extra.ceiling Date.Extra.Day day
     in
         Date.Extra.range Date.Extra.Hour 1 midnight lastHour
 
