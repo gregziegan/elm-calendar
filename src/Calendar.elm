@@ -34,7 +34,7 @@ Hey it's a calendar!
 import Html exposing (..)
 import Date exposing (Date)
 import Config
-import Calendar.Calendar as Internal
+import Calendar.Internal as Internal
 import Calendar.Msg
 import Html.App as Html
 import Calendar.Msg as InternalMsg

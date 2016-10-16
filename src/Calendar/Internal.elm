@@ -1,4 +1,4 @@
-module Calendar.Calendar exposing (..)
+module Calendar.Internal exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
