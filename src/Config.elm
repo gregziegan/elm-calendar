@@ -2,6 +2,7 @@ module Config exposing (..)
 
 import Date exposing (Date)
 import Time exposing (Time)
+import Mouse
 
 
 type alias ViewConfig event =
@@ -16,9 +17,9 @@ type alias TimeSlotConfig msg =
     { onClick : Date -> Maybe msg
     , onMouseEnter : Date -> Maybe msg
     , onMouseLeave : Date -> Maybe msg
-    , onDragStart : Date -> Maybe msg
-    , onDragging : Date -> Maybe msg
-    , onDragEnd : Date -> Maybe msg
+    , onDragStart : Date -> Mouse.Position -> Maybe msg
+    , onDragging : Date -> Mouse.Position -> Maybe msg
+    , onDragEnd : Date -> Mouse.Position -> Maybe msg
     }
 
 

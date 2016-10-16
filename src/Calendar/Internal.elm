@@ -44,8 +44,8 @@ init timeSpan viewing =
 
 update : EventConfig msg -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
 update eventConfig timeSlotConfig msg state =
-    case Debug.log "msg" msg of
-        -- case msg of
+    -- case Debug.log "msg" msg of
+    case msg of
         PageBack ->
             ( state
                 |> page -1
@@ -81,17 +81,17 @@ update eventConfig timeSlotConfig msg state =
 
         TimeSlotDragStart date xy ->
             ( { state | dragState = Just { start = xy, current = xy, kind = TimeSlot date } }
-            , timeSlotConfig.onDragStart date
+            , timeSlotConfig.onDragStart date xy
             )
 
         TimeSlotDragging date xy ->
             ( { state | dragState = (Maybe.map (\{ start, kind } -> Drag start xy kind) state.dragState) }
-            , timeSlotConfig.onDragging date
+            , timeSlotConfig.onDragging (getNewDateBasedOnPosition date xy state) xy
             )
 
         TimeSlotDragEnd date xy ->
             ( { state | dragState = Nothing }
-            , timeSlotConfig.onDragEnd date
+            , timeSlotConfig.onDragEnd (getNewDateBasedOnPosition date xy state) xy
             )
 
         EventClick eventId ->
@@ -125,17 +125,25 @@ update eventConfig timeSlotConfig msg state =
             )
 
 
+getNewDateBasedOnPosition : Date -> Mouse.Position -> State -> Date
+getNewDateBasedOnPosition date xy state =
+    let
+        timeDiff =
+            getTimeDiffForPosition xy state
+                |> floor
+    in
+        Date.Extra.add Date.Extra.Millisecond timeDiff date
+
+
 getTimeDiffForPosition : Mouse.Position -> State -> Time
 getTimeDiffForPosition xy state =
     let
         timeDiff { start, current } =
-            current.y
-                - start.y
-                |> (flip (//)) 20
+            (current.y - start.y)
+                // 20
                 |> toFloat
                 |> (*) Time.minute
                 |> (*) 30
-                |> Debug.log "timeDiff"
     in
         case state.timeSpan of
             Month ->
@@ -189,7 +197,10 @@ view config events { viewing, timeSpan } =
                 Agenda ->
                     Agenda.view config events viewing
     in
-        div [ class "elm-calendar--container" ]
+        div
+            [ class "elm-calendar--container"
+            , Html.Attributes.draggable "false"
+            ]
             [ div [ class "elm-calendar--calendar" ]
                 [ viewToolbar viewing timeSpan
                 , calendarView

@@ -39,6 +39,7 @@ import Calendar.Msg
 import Html.App as Html
 import Calendar.Msg as InternalMsg
 import Time exposing (Time)
+import Mouse
 
 
 {-| Create the calendar
@@ -143,9 +144,9 @@ timeSlotConfig :
     { onClick : Date -> Maybe msg
     , onMouseEnter : Date -> Maybe msg
     , onMouseLeave : Date -> Maybe msg
-    , onDragStart : Date -> Maybe msg
-    , onDragging : Date -> Maybe msg
-    , onDragEnd : Date -> Maybe msg
+    , onDragStart : Date -> Mouse.Position -> Maybe msg
+    , onDragging : Date -> Mouse.Position -> Maybe msg
+    , onDragEnd : Date -> Mouse.Position -> Maybe msg
     }
     -> TimeSlotConfig msg
 timeSlotConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDragEnd } =

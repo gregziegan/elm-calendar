@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.App as Html
 import Calendar
 import Date exposing (Date)
-import Fixtures exposing (Event)
+import Fixtures
 
 
 main : Program Never
@@ -18,6 +18,14 @@ main =
 
 type alias Model =
     { calendarState : Calendar.State }
+
+
+type alias Event =
+    { id : String
+    , title : String
+    , start : Date
+    , end : Date
+    }
 
 
 model : Model
@@ -85,7 +93,7 @@ timeSlotConfig =
         { onClick = \date -> Just <| SelectDate date
         , onMouseEnter = \_ -> Nothing
         , onMouseLeave = \_ -> Nothing
-        , onDragStart = \_ -> Nothing
-        , onDragging = \_ -> Nothing
-        , onDragEnd = \_ -> Nothing
+        , onDragStart = \_ _ -> Nothing
+        , onDragging = \_ _ -> Nothing
+        , onDragEnd = \_ _ -> Nothing
         }
