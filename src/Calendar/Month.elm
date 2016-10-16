@@ -83,8 +83,7 @@ viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (Html Msg)
 viewWeekEvent config week event =
     let
         eventRange sunday =
-            Date.Extra.add Date.Extra.Millisecond 1 sunday
-                |> rangeDescription (config.start event) (config.end event) Date.Extra.Sunday
+            rangeDescription (config.start event) (config.end event) Date.Extra.Sunday sunday
     in
         Maybe.map eventRange (List.head week)
             |> maybeAndThen (Event.maybeViewMonthEvent config event)

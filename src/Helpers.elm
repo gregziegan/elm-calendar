@@ -10,17 +10,19 @@ hourString date =
     Date.Extra.toFormattedString "h:mm a" date
 
 
+bumpMidnightBoundary : Date -> Date
+bumpMidnightBoundary date =
+    if Date.Extra.fractionalDay date == 0 then
+        Date.Extra.add Date.Extra.Millisecond 1 date
+    else
+        date
+
+
 hours : Date -> List Date
 hours date =
     let
-        checkMidnightBoundary date =
-            if Date.Extra.fractionalDay date == 0 then
-                Date.Extra.add Date.Extra.Millisecond 1 date
-            else
-                date
-
         day =
-            checkMidnightBoundary date
+            bumpMidnightBoundary date
 
         midnight =
             Date.Extra.floor Date.Extra.Day day

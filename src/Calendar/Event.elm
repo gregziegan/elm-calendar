@@ -9,6 +9,7 @@ import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Config exposing (ViewConfig)
 import Json.Decode as Json
 import Mouse
+import Helpers
 
 
 type EventRange
@@ -22,11 +23,14 @@ type EventRange
 rangeDescription : Date -> Date -> Date.Extra.Interval -> Date -> EventRange
 rangeDescription start end interval date =
     let
+        day =
+            Helpers.bumpMidnightBoundary date
+
         begInterval =
-            Date.Extra.floor interval date
+            Date.Extra.floor interval day
 
         endInterval =
-            Date.Extra.ceiling interval date
+            Date.Extra.ceiling interval day
                 |> Date.Extra.add Date.Extra.Millisecond -1
 
         startsThisInterval =
