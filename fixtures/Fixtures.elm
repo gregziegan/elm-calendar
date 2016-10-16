@@ -158,7 +158,7 @@ eventTwo =
 
 
 eventThree =
-    { id = "payingbills", title = "Paying Bills Alone", start = fromParts 2016 Oct 5 15 15 0 0, end = fromParts 2016 Oct 5 15 45 0 0 }
+    { id = "payingbills", title = "Paying Bills Alone", start = fromParts 2016 Oct 5 15 15 0 0, end = fromParts 2016 Oct 5 16 45 0 0 }
 
 
 eventFour =

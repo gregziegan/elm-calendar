@@ -38,6 +38,7 @@ import Calendar.Calendar as Internal
 import Calendar.Msg
 import Html.App as Html
 import Calendar.Msg as InternalMsg
+import Time exposing (Time)
 
 
 {-| Create the calendar
@@ -165,8 +166,8 @@ eventConfig :
     , onMouseEnter : String -> Maybe msg
     , onMouseLeave : String -> Maybe msg
     , onDragStart : String -> Maybe msg
-    , onDragging : String -> Maybe msg
-    , onDragEnd : String -> Maybe msg
+    , onDragging : String -> Time -> Maybe msg
+    , onDragEnd : String -> Time -> Maybe msg
     }
     -> EventConfig msg
 eventConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDragEnd } =

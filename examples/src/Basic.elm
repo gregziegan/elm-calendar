@@ -4,7 +4,6 @@ import Html exposing (..)
 import Html.App as Html
 import Calendar
 import Date exposing (Date)
-import Time
 import Fixtures exposing (Event)
 
 
@@ -75,8 +74,8 @@ eventConfig =
         , onMouseEnter = \_ -> Nothing
         , onMouseLeave = \_ -> Nothing
         , onDragStart = \_ -> Nothing
-        , onDragging = \_ -> Nothing
-        , onDragEnd = \_ -> Nothing
+        , onDragging = \_ _ -> Nothing
+        , onDragEnd = \_ _ -> Nothing
         }
 
 

@@ -12,6 +12,7 @@ import Calendar.Month as Month
 import Calendar.Week as Week
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Mouse
+import Time exposing (Time)
 
 
 type alias State =
@@ -115,13 +116,38 @@ update eventConfig timeSlotConfig msg state =
 
         EventDragging eventId xy ->
             ( { state | dragState = (Maybe.map (\{ start, kind } -> Drag start xy kind) state.dragState) }
-            , eventConfig.onDragging eventId
+            , eventConfig.onDragging eventId (getTimeDiffForPosition xy state)
             )
 
         EventDragEnd eventId xy ->
             ( { state | dragState = Nothing }
-            , eventConfig.onDragEnd eventId
+            , eventConfig.onDragEnd eventId (getTimeDiffForPosition xy state)
             )
+
+
+getTimeDiffForPosition : Mouse.Position -> State -> Time
+getTimeDiffForPosition xy state =
+    let
+        timeDiff { start, current } =
+            current.y
+                - start.y
+                |> (flip (//)) 20
+                |> toFloat
+                |> (*) Time.minute
+                |> (*) 30
+                |> Debug.log "timeDiff"
+    in
+        case state.timeSpan of
+            Month ->
+                0
+
+            _ ->
+                case state.dragState of
+                    Just drag ->
+                        timeDiff drag
+
+                    Nothing ->
+                        0
 
 
 page : Int -> State -> State
@@ -163,12 +189,12 @@ view config events { viewing, timeSpan } =
                 Agenda ->
                     Agenda.view config events viewing
     in
-        div [class "elm-calendar--container"] [
-          div [ class "elm-calendar--calendar" ]
-              [ viewToolbar viewing timeSpan
-              , calendarView
-              ]
-        ]
+        div [ class "elm-calendar--container" ]
+            [ div [ class "elm-calendar--calendar" ]
+                [ viewToolbar viewing timeSpan
+                , calendarView
+                ]
+            ]
 
 
 viewToolbar : Date -> TimeSpan -> Html Msg
@@ -182,7 +208,7 @@ viewToolbar viewing timeSpan =
 
 viewTitle : Date -> Html Msg
 viewTitle viewing =
-    div [ class "elm-calendar--month-title"]
+    div [ class "elm-calendar--month-title" ]
         [ h2 [] [ text <| Date.Extra.toFormattedString "MMMM yyyy" viewing ] ]
 
 

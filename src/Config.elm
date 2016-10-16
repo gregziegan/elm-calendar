@@ -1,6 +1,7 @@
 module Config exposing (..)
 
 import Date exposing (Date)
+import Time exposing (Time)
 
 
 type alias ViewConfig event =
@@ -26,6 +27,6 @@ type alias EventConfig msg =
     , onMouseEnter : String -> Maybe msg
     , onMouseLeave : String -> Maybe msg
     , onDragStart : String -> Maybe msg
-    , onDragging : String -> Maybe msg
-    , onDragEnd : String -> Maybe msg
+    , onDragging : String -> Time -> Maybe msg
+    , onDragEnd : String -> Time -> Maybe msg
     }
