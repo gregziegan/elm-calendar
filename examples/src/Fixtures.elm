@@ -142,19 +142,19 @@ viewConfig =
 
 
 eventOne =
-    { id = "0", title = "Brunch w/ Friends", start = fromParts 2016 Oct 4 13 30 0 0, end = fromParts 2016 Oct 4 15 0 0 0 }
+    { id = "1", title = "Brunch w/ Friends", start = fromParts 2016 Oct 4 13 30 0 0, end = fromParts 2016 Oct 4 15 0 0 0 }
 
 
 eventTwo =
-    { id = "1", title = "Brunch w/o Friends :(", start = fromParts 2016 Oct 5 13 30 0 0, end = fromParts 2016 Oct 5 14 10 0 0 }
+    { id = "2", title = "Brunch w/o Friends :(", start = fromParts 2016 Oct 5 13 30 0 0, end = fromParts 2016 Oct 5 14 10 0 0 }
 
 
 eventThree =
-    { id = "2", title = "Paying Bills Alone", start = fromParts 2016 Oct 5 15 15 0 0, end = fromParts 2016 Oct 5 16 45 0 0 }
+    { id = "3", title = "Paying Bills Alone", start = fromParts 2016 Oct 5 15 15 0 0, end = fromParts 2016 Oct 5 16 45 0 0 }
 
 
 eventFour =
-    { id = "3", title = "A Tech Conference", start = fromParts 2016 Oct 18 9 0 0 0, end = fromParts 2016 Oct 21 4 0 0 0 }
+    { id = "4", title = "A Tech Conference", start = fromParts 2016 Oct 18 9 0 0 0, end = fromParts 2016 Oct 21 4 0 0 0 }
 
 
 eventGroups =

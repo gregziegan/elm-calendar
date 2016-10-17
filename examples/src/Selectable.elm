@@ -53,7 +53,7 @@ type alias EventPreview =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { calendarState = Calendar.init Calendar.Month Fixtures.viewing
+    ( { calendarState = Calendar.init Calendar.Week Fixtures.viewing
       , events =
             Fixtures.events
                 |> List.map (\event -> ( event.id, event ))
@@ -63,10 +63,11 @@ init =
       , curEventId =
             Fixtures.events
                 |> List.map (Result.withDefault 0 << String.toInt << .id)
-                |> List.sort
+                |> List.sortWith flippedComparison
                 |> List.head
                 |> Maybe.withDefault (List.length Fixtures.events)
                 |> toString
+                |> Debug.log "first?"
       }
     , Cmd.none
     )
@@ -82,10 +83,16 @@ type CalendarMsg
     | ExtendEvent String Time
     | CreateEventPreview Date Mouse.Position
     | ExtendEventPreview Date Mouse.Position
+    | AddEventPreviewToEvents Date Mouse.Position
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    ( pureUpdate msg model, Cmd.none )
+
+
+pureUpdate : Msg -> Model -> Model
+pureUpdate msg model =
     case msg of
         SetCalendarState calendarMsg ->
             let
@@ -97,20 +104,20 @@ update msg model =
             in
                 case maybeMsg of
                     Nothing ->
-                        ( newModel, Cmd.none )
+                        newModel
 
                     Just updateMsg ->
                         updateCalendar updateMsg newModel
 
 
-updateCalendar : CalendarMsg -> Model -> ( Model, Cmd Msg )
+updateCalendar : CalendarMsg -> Model -> Model
 updateCalendar msg model =
     case Debug.log "calendarMsg" msg of
         SelectDate date ->
-            ( model, Cmd.none )
+            model
 
         ExtendingEvent _ timeDiff ->
-            ( { model | eventExtendAmount = timeDiff }, Cmd.none )
+            { model | eventExtendAmount = timeDiff }
 
         ExtendEvent eventId timeDiff ->
             let
@@ -130,10 +137,10 @@ updateCalendar msg model =
             in
                 case maybeEvent of
                     Nothing ->
-                        ( model, Cmd.none )
+                        model
 
                     Just event ->
-                        ( { model | events = updateEvents event }, Cmd.none )
+                        { model | events = updateEvents event }
 
         CreateEventPreview date xy ->
             let
@@ -145,14 +152,45 @@ updateCalendar msg model =
                     , position = xy
                     }
             in
-                ( { model | eventPreview = Just eventPreview }, Cmd.none )
+                { model | eventPreview = Just eventPreview }
 
         ExtendEventPreview date xy ->
-            let
-                extendEventPreview ({ event, position } as eventPreview) =
-                    { eventPreview | event = { event | end = date } }
-            in
-                ( { model | eventPreview = Maybe.map extendEventPreview model.eventPreview }, Cmd.none )
+            model
+                |> extendEventPreview date xy
+
+        AddEventPreviewToEvents date xy ->
+            model
+                |> extendEventPreview date xy
+                |> addEventPreviewToEvents
+                |> removeEventPreview
+
+
+extendEventPreview : Date -> Mouse.Position -> Model -> Model
+extendEventPreview date xy model =
+    let
+        extend ({ event, position } as eventPreview) =
+            { eventPreview | event = { event | end = date } }
+    in
+        { model | eventPreview = Maybe.map extend model.eventPreview }
+
+
+addEventPreviewToEvents : Model -> Model
+addEventPreviewToEvents model =
+    let
+        addToEvents event =
+            Dict.insert event.id event model.events
+    in
+        { model
+            | events =
+                Maybe.map (addToEvents << .event) model.eventPreview
+                    |> Maybe.withDefault model.events
+            , curEventId = (newEventId model.curEventId)
+        }
+
+
+removeEventPreview : Model -> Model
+removeEventPreview model =
+    { model | eventPreview = Nothing }
 
 
 newEventId : String -> String
@@ -161,6 +199,7 @@ newEventId eventId =
         |> Result.withDefault 0
         |> (+) 1
         |> toString
+        |> Debug.log "newEventId"
 
 
 view : Model -> Html Msg
@@ -238,5 +277,17 @@ timeSlotConfig =
         , onMouseLeave = \_ -> Nothing
         , onDragStart = \date xy -> Just <| CreateEventPreview date xy
         , onDragging = \date xy -> Just <| ExtendEventPreview date xy
-        , onDragEnd = \date xy -> Nothing
+        , onDragEnd = \date xy -> Just <| AddEventPreviewToEvents date xy
         }
+
+
+flippedComparison a b =
+    case compare a b of
+        LT ->
+            GT
+
+        EQ ->
+            EQ
+
+        GT ->
+            LT
