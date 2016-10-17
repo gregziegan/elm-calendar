@@ -1,7 +1,8 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, style)
+import Html.Attributes exposing (class, classList, style, value)
+import Html.Events exposing (onInput, onClick)
 import Html.App as Html
 import Calendar
 import Date exposing (Date)
@@ -49,6 +50,7 @@ type alias Event =
 type alias EventPreview =
     { event : Event
     , position : Mouse.Position
+    , showDialog : Bool
     }
 
 
@@ -76,13 +78,15 @@ init =
 
 type Msg
     = SetCalendarState Calendar.Msg
+    | CreateEventTitle String
+    | AddEventPreviewToEvents
 
 
 type CalendarMsg
     = SelectDate Date
     | CreateEventPreview Date Mouse.Position
     | ExtendEventPreview Date Mouse.Position
-    | AddEventPreviewToEvents Date Mouse.Position
+    | ShowCreateEventDialog Date Mouse.Position
     | SelectEvent String
     | ExtendingEvent String Time
     | ExtendEvent String Time
@@ -111,6 +115,15 @@ pureUpdate msg model =
                     Just updateMsg ->
                         updateCalendar updateMsg newModel
 
+        CreateEventTitle title ->
+            model
+                |> changeEventPreviewTitle title
+
+        AddEventPreviewToEvents ->
+            model
+                |> addEventPreviewToEvents
+                |> removeEventPreview
+
 
 updateCalendar : CalendarMsg -> Model -> Model
 updateCalendar msg model =
@@ -121,11 +134,12 @@ updateCalendar msg model =
         CreateEventPreview date xy ->
             let
                 newEvent =
-                    Event (newEventId model.curEventId) "untitled" date (Date.Extra.add Date.Extra.Minute 30 date)
+                    Event (newEventId model.curEventId) "" date (Date.Extra.add Date.Extra.Minute 30 date)
 
                 eventPreview =
                     { event = newEvent
                     , position = xy
+                    , showDialog = False
                     }
             in
                 { model | eventPreview = Just eventPreview }
@@ -134,11 +148,10 @@ updateCalendar msg model =
             model
                 |> extendEventPreview date xy
 
-        AddEventPreviewToEvents date xy ->
+        ShowCreateEventDialog date xy ->
             model
                 |> extendEventPreview date xy
-                |> addEventPreviewToEvents
-                |> removeEventPreview
+                |> showCreateEventDialog
 
         SelectEvent eventId ->
             model
@@ -174,6 +187,28 @@ updateCalendar msg model =
 selectEvent : String -> Model -> Model
 selectEvent eventId model =
     { model | selectedEvent = Dict.get eventId model.events }
+
+
+showCreateEventDialog : Model -> Model
+showCreateEventDialog model =
+    { model | eventPreview = Maybe.map toggleEventPreviewDialog model.eventPreview }
+
+
+toggleEventPreviewDialog : EventPreview -> EventPreview
+toggleEventPreviewDialog eventPreview =
+    { eventPreview | showDialog = not eventPreview.showDialog }
+
+
+changeEventPreviewTitle : String -> Model -> Model
+changeEventPreviewTitle title model =
+    let
+        changeEventTitle event =
+            { event | title = title }
+
+        changePreviewTitle preview =
+            { preview | event = changeEventTitle preview.event }
+    in
+        { model | eventPreview = Maybe.map changePreviewTitle model.eventPreview }
 
 
 extendEventPreview : Date -> Mouse.Position -> Model -> Model
@@ -235,8 +270,13 @@ view model =
     (,)
 
 
+px : String -> String
+px str =
+    str ++ "px"
+
+
 viewCreateEvent : EventPreview -> Html Msg
-viewCreateEvent { event, position } =
+viewCreateEvent ({ event, position, showDialog } as preview) =
     let
         duration =
             Date.Extra.diff Date.Extra.Minute event.start event.end
@@ -246,9 +286,6 @@ viewCreateEvent { event, position } =
                 // 30
                 |> (*) 20
                 |> toString
-
-        px str =
-            str ++ "px"
     in
         div
             [ class "event-preview"
@@ -260,7 +297,32 @@ viewCreateEvent { event, position } =
                 , "z-index" => "2"
                 ]
             ]
-            [ text "New Event" ]
+            [ if Debug.log "showDialog" showDialog then
+                viewCreateEventDialog preview
+              else
+                text ""
+            , text "New Event"
+            ]
+
+
+viewCreateEventDialog : EventPreview -> Html Msg
+viewCreateEventDialog { event, position } =
+    div
+        [ class "create-event-dialog"
+        ]
+        [ h3 [ class "create-event-title" ] [ text "Create event" ]
+        , input
+            [ onInput CreateEventTitle
+            , value event.title
+            , class "create-event-input"
+            ]
+            []
+        , button
+            [ onClick AddEventPreviewToEvents
+            , class "create-event-button"
+            ]
+            [ text "Create Event" ]
+        ]
 
 
 viewConfig : Calendar.ViewConfig Event
@@ -306,7 +368,7 @@ timeSlotConfig =
         , onMouseLeave = \_ -> Nothing
         , onDragStart = \date xy -> Just <| CreateEventPreview date xy
         , onDragging = \date xy -> Just <| ExtendEventPreview date xy
-        , onDragEnd = \date xy -> Just <| AddEventPreviewToEvents date xy
+        , onDragEnd = \date xy -> Just <| ShowCreateEventDialog date xy
         }
 
 
