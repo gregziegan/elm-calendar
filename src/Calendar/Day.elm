@@ -13,13 +13,13 @@ import Mouse
 import Calendar.Event as Event exposing (rangeDescription)
 
 
-view : ViewConfig event -> List event -> Date -> Html Msg
-view config events day =
+view : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
+view config events selectedId day =
     div [ class "elm-calendar--day" ]
         [ viewDayHeader day
         , div [ class "elm-calendar--day-content" ]
             [ viewTimeGutter day
-            , viewDaySlot config events day
+            , viewDaySlot config events selectedId day
             ]
         ]
 
@@ -68,11 +68,11 @@ viewHourSlot date =
         [ span [ class "elm-calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
 
 
-viewDaySlot : ViewConfig event -> List event -> Date -> Html Msg
-viewDaySlot config events day =
+viewDaySlot : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
+viewDaySlot config events selectedId day =
     Helpers.hours day
         |> List.map viewDaySlotGroup
-        |> (flip (++)) (viewDayEvents config events day)
+        |> (flip (++)) (viewDayEvents config events selectedId day)
         |> div [ class "elm-calendar--day-slot" ]
 
 
@@ -96,18 +96,18 @@ viewTimeSlot date =
         []
 
 
-viewDayEvents : ViewConfig event -> List event -> Date -> List (Html Msg)
-viewDayEvents config events day =
-    List.filterMap (viewDayEvent config day) events
+viewDayEvents : ViewConfig event -> List event -> Maybe String -> Date -> List (Html Msg)
+viewDayEvents config events selectedId day =
+    List.filterMap (viewDayEvent config day selectedId) events
 
 
-viewDayEvent : ViewConfig event -> Date -> event -> Maybe (Html Msg)
-viewDayEvent config day event =
+viewDayEvent : ViewConfig event -> Date -> Maybe String -> event -> Maybe (Html Msg)
+viewDayEvent config day selectedId event =
     let
         eventRange =
             rangeDescription (config.start event) (config.end event) Date.Extra.Day day
     in
-        Event.maybeViewDayEvent config event eventRange
+        Event.maybeViewDayEvent config event selectedId eventRange
 
 
 viewAllDayCell : List Date -> Html Msg

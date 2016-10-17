@@ -133,14 +133,6 @@ hoursInADay =
     ]
 
 
-viewConfig =
-    { toId = .id
-    , title = .title
-    , start = .start
-    , end = .end
-    }
-
-
 eventOne =
     { id = "1", title = "Brunch w/ Friends", start = fromParts 2016 Oct 4 13 30 0 0, end = fromParts 2016 Oct 4 15 0 0 0 }
 

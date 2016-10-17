@@ -3,6 +3,15 @@ module Config exposing (..)
 import Date exposing (Date)
 import Time exposing (Time)
 import Mouse
+import Html exposing (Html, Attribute)
+import Calendar.Msg as InternalMsg
+
+
+type alias EventView =
+    { nodeName : String
+    , classes : List ( String, Bool )
+    , children : List (Html InternalMsg.Msg)
+    }
 
 
 type alias ViewConfig event =
@@ -10,6 +19,7 @@ type alias ViewConfig event =
     , title : event -> String
     , start : event -> Date
     , end : event -> Date
+    , event : event -> Bool -> EventView
     }
 
 

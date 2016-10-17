@@ -19,6 +19,7 @@ type alias State =
     { timeSpan : TimeSpan
     , viewing : Date
     , dragState : Maybe Drag
+    , selected : Maybe String
     }
 
 
@@ -39,6 +40,7 @@ init timeSpan viewing =
     { timeSpan = timeSpan
     , viewing = viewing
     , dragState = Nothing
+    , selected = Nothing
     }
 
 
@@ -95,7 +97,7 @@ update eventConfig timeSlotConfig msg state =
             )
 
         EventClick eventId ->
-            ( state
+            ( { state | selected = Just eventId }
             , eventConfig.onClick eventId
             )
 
@@ -181,18 +183,18 @@ changeTimeSpan timeSpan state =
 
 
 view : ViewConfig event -> List event -> State -> Html Msg
-view config events { viewing, timeSpan } =
+view config events { viewing, timeSpan, selected } =
     let
         calendarView =
             case timeSpan of
                 Month ->
-                    Month.view config events viewing
+                    Month.view config events selected viewing
 
                 Week ->
-                    Week.view config events viewing
+                    Week.view config events selected viewing
 
                 Day ->
-                    Day.view config events viewing
+                    Day.view config events selected viewing
 
                 Agenda ->
                     Agenda.view config events viewing

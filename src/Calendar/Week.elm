@@ -9,42 +9,48 @@ import Config exposing (ViewConfig)
 import Helpers
 
 
-viewWeekContent : ViewConfig event -> List event -> Date -> List Date -> Html Msg
-viewWeekContent config events viewing days =
+viewWeekContent :
+    ViewConfig event
+    -> List event
+    -> Maybe String
+    -> Date
+    -> List Date
+    -> Html Msg
+viewWeekContent config events selectedId viewing days =
     let
         timeGutter =
             viewTimeGutter viewing
 
         weekDays =
-            List.map (viewWeekDay config events) days
+            List.map (viewWeekDay config events selectedId) days
     in
         div [ class "elm-calendar--week-content" ]
             (timeGutter :: weekDays)
 
 
-viewWeekDay : ViewConfig event -> List event -> Date -> Html Msg
-viewWeekDay config events day =
+viewWeekDay : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
+viewWeekDay config events selectedId day =
     let
         viewDaySlots =
             Helpers.hours day
                 |> List.map viewDaySlotGroup
 
         dayEvents =
-            viewDayEvents config events day
+            viewDayEvents config events selectedId day
     in
         div [ class "elm-calendar--day" ]
             (viewDaySlots ++ dayEvents)
 
 
-view : ViewConfig event -> List event -> Date -> Html Msg
-view config events viewing =
+view : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
+view config events selectedId viewing =
     let
         weekRange =
             Helpers.dayRangeOfWeek viewing
     in
         div [ class "elm-calendar--week" ]
             [ viewWeekHeader weekRange
-            , viewWeekContent config events viewing weekRange
+            , viewWeekContent config events selectedId viewing weekRange
             ]
 
 

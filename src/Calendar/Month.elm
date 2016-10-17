@@ -11,8 +11,8 @@ import Calendar.Msg exposing (Msg)
 import Calendar.Event as Event exposing (rangeDescription)
 
 
-view : ViewConfig event -> List event -> Date -> Html Msg
-view config events viewing =
+view : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
+view config events selectedId viewing =
     let
         weeks =
             Helpers.weekRangesFromMonth (Date.year viewing) (Date.month viewing)
@@ -20,7 +20,7 @@ view config events viewing =
         div [ class "elm-calendar--column" ]
             [ viewMonthHeader
             , div [ class "elm-calendar--month" ]
-                (List.map (viewMonthRow config events) weeks)
+                (List.map (viewMonthRow config events selectedId) weeks)
             ]
 
 
@@ -39,11 +39,11 @@ viewDay day =
         [ a [ class "elm-calendar--date", href "#" ] [ text <| toString day ] ]
 
 
-viewMonthRow : ViewConfig event -> List event -> List Date -> Html Msg
-viewMonthRow config events week =
+viewMonthRow : ViewConfig event -> List event -> Maybe String -> List Date -> Html Msg
+viewMonthRow config events selectedId week =
     div [ class "elm-calendar--month-row" ]
         [ viewMonthRowBackground week
-        , viewMonthRowContent config events week
+        , viewMonthRowContent config events selectedId week
         ]
 
 
@@ -53,8 +53,8 @@ viewMonthRowBackground week =
         (List.map (\_ -> div [ class "elm-calendar--cell" ] []) week)
 
 
-viewMonthRowContent : ViewConfig event -> List event -> List Date -> Html Msg
-viewMonthRowContent config events week =
+viewMonthRowContent : ViewConfig event -> List event -> Maybe String -> List Date -> Html Msg
+viewMonthRowContent config events selectedId week =
     let
         dateCell date =
             div [ class "elm-calendar--date-cell" ]
@@ -67,7 +67,7 @@ viewMonthRowContent config events week =
             div [ class "elm-calendar--row" ] (List.map dateCell week)
 
         eventRows =
-            List.filterMap (viewWeekEvent config week) events
+            List.filterMap (viewWeekEvent config week selectedId) events
                 |> List.take 3
     in
         div [ class "elm-calendar--month-week" ]
@@ -79,11 +79,11 @@ maybeAndThen =
     flip Maybe.andThen
 
 
-viewWeekEvent : ViewConfig event -> List Date -> event -> Maybe (Html Msg)
-viewWeekEvent config week event =
+viewWeekEvent : ViewConfig event -> List Date -> Maybe String -> event -> Maybe (Html Msg)
+viewWeekEvent config week selectedId event =
     let
         eventRange sunday =
             rangeDescription (config.start event) (config.end event) Date.Extra.Sunday sunday
     in
         Maybe.map eventRange (List.head week)
-            |> maybeAndThen (Event.maybeViewMonthEvent config event)
+            |> maybeAndThen (Event.maybeViewMonthEvent config event selectedId)

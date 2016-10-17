@@ -11,6 +11,8 @@ module Calendar
         , viewConfig
         , ViewConfig
         , eventConfig
+        , EventView
+        , eventView
         , EventConfig
         , timeSlotConfig
         , TimeSlotConfig
@@ -28,10 +30,11 @@ Hey it's a calendar!
 @docs Msg, update, page, changeTimeSpan, eventConfig, EventConfig, timeSlotConfig, TimeSlotConfig, subscriptions
 
 # View
-@docs view, viewConfig, ViewConfig
+@docs view, viewConfig, ViewConfig, EventView, eventView
 -}
 
 import Html exposing (..)
+import Html.App as Html
 import Date exposing (Date)
 import Config
 import Calendar.Internal as Internal
@@ -120,6 +123,28 @@ type EventConfig msg
     = EventConfig (Config.EventConfig msg)
 
 
+{-| event view type
+-}
+type EventView
+    = EventView Config.EventView
+
+
+{-| configure a custom event view
+-}
+eventView :
+    { nodeName : String
+    , classes : List ( String, Bool )
+    , children : List (Html InternalMsg.Msg)
+    }
+    -> EventView
+eventView { nodeName, classes, children } =
+    EventView
+        { nodeName = nodeName
+        , classes = classes
+        , children = children
+        }
+
+
 {-| configure the view
 -}
 viewConfig :
@@ -127,15 +152,26 @@ viewConfig :
     , title : event -> String
     , start : event -> Date
     , end : event -> Date
+    , event : event -> Bool -> EventView
     }
     -> ViewConfig event
-viewConfig { toId, title, start, end } =
-    ViewConfig
-        { toId = toId
-        , title = title
-        , start = start
-        , end = end
-        }
+viewConfig { toId, title, start, end, event } =
+    let
+        extractEventView eventView =
+            case eventView of
+                EventView eventView_ ->
+                    eventView_
+
+        eventView id selected =
+            extractEventView <| event id selected
+    in
+        ViewConfig
+            { toId = toId
+            , title = title
+            , start = start
+            , end = end
+            , event = eventView
+            }
 
 
 {-| configure time slot interactions

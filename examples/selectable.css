@@ -2,3 +2,7 @@
   width: 100px;
   background-color: #f4f4f4;
 }
+
+.elm-calendar--event-content--is-selected {
+  background-color: #efa500;
+}

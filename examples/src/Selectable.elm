@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (class, style)
+import Html.Attributes exposing (class, classList, style)
 import Html.App as Html
 import Calendar
 import Date exposing (Date)
@@ -34,6 +34,7 @@ type alias Model =
     , eventExtendAmount : Time
     , eventPreview : Maybe EventPreview
     , curEventId : String
+    , selectedEvent : Maybe Event
     }
 
 
@@ -67,7 +68,7 @@ init =
                 |> List.head
                 |> Maybe.withDefault (List.length Fixtures.events)
                 |> toString
-                |> Debug.log "first?"
+      , selectedEvent = Nothing
       }
     , Cmd.none
     )
@@ -79,11 +80,12 @@ type Msg
 
 type CalendarMsg
     = SelectDate Date
-    | ExtendingEvent String Time
-    | ExtendEvent String Time
     | CreateEventPreview Date Mouse.Position
     | ExtendEventPreview Date Mouse.Position
     | AddEventPreviewToEvents Date Mouse.Position
+    | SelectEvent String
+    | ExtendingEvent String Time
+    | ExtendEvent String Time
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -116,6 +118,32 @@ updateCalendar msg model =
         SelectDate date ->
             model
 
+        CreateEventPreview date xy ->
+            let
+                newEvent =
+                    Event (newEventId model.curEventId) "untitled" date (Date.Extra.add Date.Extra.Minute 30 date)
+
+                eventPreview =
+                    { event = newEvent
+                    , position = xy
+                    }
+            in
+                { model | eventPreview = Just eventPreview }
+
+        ExtendEventPreview date xy ->
+            model
+                |> extendEventPreview date xy
+
+        AddEventPreviewToEvents date xy ->
+            model
+                |> extendEventPreview date xy
+                |> addEventPreviewToEvents
+                |> removeEventPreview
+
+        SelectEvent eventId ->
+            model
+                |> selectEvent eventId
+
         ExtendingEvent _ timeDiff ->
             { model | eventExtendAmount = timeDiff }
 
@@ -142,27 +170,10 @@ updateCalendar msg model =
                     Just event ->
                         { model | events = updateEvents event }
 
-        CreateEventPreview date xy ->
-            let
-                newEvent =
-                    Event (newEventId model.curEventId) "untitled" date (Date.Extra.add Date.Extra.Minute 30 date)
 
-                eventPreview =
-                    { event = newEvent
-                    , position = xy
-                    }
-            in
-                { model | eventPreview = Just eventPreview }
-
-        ExtendEventPreview date xy ->
-            model
-                |> extendEventPreview date xy
-
-        AddEventPreviewToEvents date xy ->
-            model
-                |> extendEventPreview date xy
-                |> addEventPreviewToEvents
-                |> removeEventPreview
+selectEvent : String -> Model -> Model
+selectEvent eventId model =
+    { model | selectedEvent = Dict.get eventId model.events }
 
 
 extendEventPreview : Date -> Mouse.Position -> Model -> Model
@@ -254,13 +265,31 @@ viewCreateEvent { event, position } =
 
 viewConfig : Calendar.ViewConfig Event
 viewConfig =
-    Calendar.viewConfig Fixtures.viewConfig
+    Calendar.viewConfig
+        { toId = .id
+        , title = .title
+        , start = .start
+        , end = .end
+        , event =
+            \event isSelected ->
+                Calendar.eventView
+                    { nodeName = "div"
+                    , classes =
+                        [ ( "elm-calendar--event-content", True )
+                        , ( "elm-calendar--event-content--is-selected", isSelected )
+                        ]
+                    , children =
+                        [ div []
+                            [ text <| event.title ]
+                        ]
+                    }
+        }
 
 
 eventConfig : Calendar.EventConfig CalendarMsg
 eventConfig =
     Calendar.eventConfig
-        { onClick = \_ -> Nothing
+        { onClick = \eventId -> Just <| SelectEvent eventId
         , onMouseEnter = \_ -> Nothing
         , onMouseLeave = \_ -> Nothing
         , onDragStart = \_ -> Nothing
@@ -281,6 +310,7 @@ timeSlotConfig =
         }
 
 
+flippedComparison : comparable -> comparable -> Order
 flippedComparison a b =
     case compare a b of
         LT ->

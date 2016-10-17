@@ -3,7 +3,7 @@ module Calendar.Event exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Html exposing (..)
-import Html.Attributes exposing (class, style)
+import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (..)
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Config exposing (ViewConfig)
@@ -59,8 +59,14 @@ rangeDescription start end interval date =
             ExistsOutside
 
 
-eventStyling : ViewConfig event -> event -> EventRange -> TimeSpan -> List (Html.Attribute Msg)
-eventStyling config event eventRange timeSpan =
+eventStyling :
+    ViewConfig event
+    -> event
+    -> EventRange
+    -> TimeSpan
+    -> List ( String, Bool )
+    -> List (Html.Attribute msg)
+eventStyling config event eventRange timeSpan customClasses =
     let
         eventStart =
             config.start event
@@ -71,19 +77,19 @@ eventStyling config event eventRange timeSpan =
         classes =
             case eventRange of
                 StartsAndEnds ->
-                    class "elm-calendar--event elm-calendar--event-starts-and-ends"
+                    "elm-calendar--event elm-calendar--event-starts-and-ends"
 
                 ContinuesAfter ->
-                    class "elm-calendar--event elm-calendar--event-continues-after"
+                    "elm-calendar--event elm-calendar--event-continues-after"
 
                 ContinuesPrior ->
-                    class "elm-calendar--event elm-calendar--event-continues-prior"
+                    "elm-calendar--event elm-calendar--event-continues-prior"
 
                 ContinuesAfterAndPrior ->
-                    class "elm-calendar--event"
+                    "elm-calendar--event"
 
                 ExistsOutside ->
-                    class ""
+                    ""
 
         styles =
             case timeSpan of
@@ -99,21 +105,21 @@ eventStyling config event eventRange timeSpan =
                 Agenda ->
                     style []
     in
-        [ classes, styles ]
+        [ classList (( classes, True ) :: customClasses), styles ]
 
 
-maybeViewMonthEvent : ViewConfig event -> event -> EventRange -> Maybe (Html Msg)
-maybeViewMonthEvent config event eventRange =
+maybeViewMonthEvent : ViewConfig event -> event -> Maybe String -> EventRange -> Maybe (Html Msg)
+maybeViewMonthEvent config event selectedId eventRange =
     case eventRange of
         ExistsOutside ->
             Nothing
 
         _ ->
-            Just <| viewMonthEvent config event eventRange
+            Just <| viewMonthEvent config event selectedId eventRange
 
 
-viewMonthEvent : ViewConfig event -> event -> EventRange -> Html Msg
-viewMonthEvent config event eventRange =
+viewMonthEvent : ViewConfig event -> event -> Maybe String -> EventRange -> Html Msg
+viewMonthEvent config event selectedId eventRange =
     let
         eventStart =
             config.start event
@@ -149,11 +155,11 @@ viewMonthEvent config event eventRange =
         if offsetLength eventStart > 0 then
             div [ class "elm-calendar--row" ]
                 [ rowSegment (offsetPercentage eventStart) []
-                , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ]
+                , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event selectedId eventRange Month ]
                 ]
         else
             div [ class "elm-calendar--row" ]
-                [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event eventRange Month ] ]
+                [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event selectedId eventRange Month ] ]
 
 
 (=>) : a -> b -> ( a, b )
@@ -161,7 +167,7 @@ viewMonthEvent config event eventRange =
     (,)
 
 
-styleDayEvent : Date -> Date -> Html.Attribute Msg
+styleDayEvent : Date -> Date -> Html.Attribute msg
 styleDayEvent start end =
     let
         startPercent =
@@ -185,33 +191,38 @@ styleDayEvent start end =
             ]
 
 
-maybeViewDayEvent : ViewConfig event -> event -> EventRange -> Maybe (Html Msg)
-maybeViewDayEvent config event eventRange =
+maybeViewDayEvent : ViewConfig event -> event -> Maybe String -> EventRange -> Maybe (Html Msg)
+maybeViewDayEvent config event selectedId eventRange =
     case eventRange of
         ExistsOutside ->
             Nothing
 
         _ ->
-            Just <| eventSegment config event eventRange Day
+            Just <| eventSegment config event selectedId eventRange Day
 
 
-eventSegment : ViewConfig event -> event -> EventRange -> TimeSpan -> Html Msg
-eventSegment config event eventRange timeSpan =
+eventSegment : ViewConfig event -> event -> Maybe String -> EventRange -> TimeSpan -> Html Msg
+eventSegment config event selectedId eventRange timeSpan =
     let
         eventId =
             config.toId event
+
+        isSelected =
+            Maybe.map ((==) eventId) selectedId
+                |> Maybe.withDefault False
+
+        { nodeName, classes, children } =
+            config.event event isSelected
     in
-        div
+        node nodeName
             ([ onClick <| EventClick eventId
              , onMouseEnter <| EventMouseEnter eventId
              , onMouseLeave <| EventMouseLeave eventId
              , on "mousedown" <| Json.map (EventDragStart eventId) Mouse.position
              ]
-                ++ eventStyling config event eventRange timeSpan
+                ++ eventStyling config event eventRange timeSpan classes
             )
-            [ div [ class "elm-calendar--event-content" ]
-                [ text <| config.title event ]
-            ]
+            children
 
 
 cellWidth : Float
@@ -235,7 +246,7 @@ offsetPercentage date =
         ++ "%"
 
 
-styleRowSegment : String -> Html.Attribute Msg
+styleRowSegment : String -> Html.Attribute msg
 styleRowSegment widthPercentage =
     style
         [ ( "flex-basis", widthPercentage )
