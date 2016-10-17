@@ -21,12 +21,7 @@ Install the calendar dependencies
 
 Install the dependencies for the examples
 
-`cd examples`
-`elm-package install`
-
-Go back to the root directory
-
-`cd ..`
+`cd examples && elm-package install && cd -`
 
 And run `elm-live examples/src/<WhicheverExample>.elm --output=examples/elm.js --open --dir=examples`
 
