@@ -2,6 +2,8 @@ module Fixtures exposing (..)
 
 import Date exposing (..)
 import Date.Extra as Date exposing (..)
+import Html
+import Calendar
 
 
 start : Date
@@ -138,6 +140,13 @@ viewConfig =
     , title = .title
     , start = .start
     , end = .end
+    , event =
+        \event isSelected ->
+            Calendar.eventView
+                { nodeName = "div"
+                , classes = []
+                , children = []
+                }
     }
 
 
