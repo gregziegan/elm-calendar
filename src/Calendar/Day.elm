@@ -8,7 +8,7 @@ import Date.Extra
 import Config exposing (ViewConfig)
 import Helpers
 import Calendar.Msg exposing (Msg(..))
-import Json.Decode as Json
+import Json.Decode as Json exposing ((:=))
 import Mouse
 import Calendar.Event as Event exposing (rangeDescription)
 
@@ -88,9 +88,9 @@ viewTimeSlot : Date -> Html Msg
 viewTimeSlot date =
     div
         [ class "elm-calendar--time-slot"
-        , onClick (TimeSlotClick date)
-        , onMouseEnter (TimeSlotMouseEnter date)
-        , onMouseLeave (TimeSlotMouseLeave date)
+        , on "click" (Json.map (TimeSlotClick date) Mouse.position)
+        , on "mouseenter" (Json.map (TimeSlotMouseEnter date) Mouse.position)
+        , on "mouseleave" (Json.map (TimeSlotMouseLeave date) Mouse.position)
         , on "mousedown" (Json.map (TimeSlotDragStart date) Mouse.position)
         ]
         []

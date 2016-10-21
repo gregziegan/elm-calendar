@@ -15,9 +15,9 @@ type Msg
     = PageBack
     | PageForward
     | ChangeTimeSpan TimeSpan
-    | TimeSlotClick Date
-    | TimeSlotMouseEnter Date
-    | TimeSlotMouseLeave Date
+    | TimeSlotClick Date Mouse.Position
+    | TimeSlotMouseEnter Date Mouse.Position
+    | TimeSlotMouseLeave Date Mouse.Position
     | TimeSlotDragStart Date Mouse.Position
     | TimeSlotDragging Date Mouse.Position
     | TimeSlotDragEnd Date Mouse.Position

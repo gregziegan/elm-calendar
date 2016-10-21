@@ -24,9 +24,9 @@ type alias ViewConfig event =
 
 
 type alias TimeSlotConfig msg =
-    { onClick : Date -> Maybe msg
-    , onMouseEnter : Date -> Maybe msg
-    , onMouseLeave : Date -> Maybe msg
+    { onClick : Date -> Mouse.Position -> Maybe msg
+    , onMouseEnter : Date -> Mouse.Position -> Maybe msg
+    , onMouseLeave : Date -> Mouse.Position -> Maybe msg
     , onDragStart : Date -> Mouse.Position -> Maybe msg
     , onDragging : Date -> Mouse.Position -> Maybe msg
     , onDragEnd : Date -> Mouse.Position -> Maybe msg

@@ -88,7 +88,7 @@ type Msg
 
 
 type CalendarMsg
-    = SelectDate Date
+    = SelectDate Date Mouse.Position
     | CreateEventPreview Date Mouse.Position
     | ExtendEventPreview Date Mouse.Position
     | ShowCreateEventDialog Date Mouse.Position
@@ -142,21 +142,14 @@ pureUpdate msg model =
 updateCalendar : CalendarMsg -> Model -> Model
 updateCalendar msg model =
     case Debug.log "calendarMsg" msg of
-        SelectDate date ->
+        SelectDate date xy ->
             model
+                |> createEventPreview date xy 30
+                |> showCreateEventDialog
 
         CreateEventPreview date xy ->
-            let
-                newEvent =
-                    Event (newEventId model.curEventId) "" date (Date.Extra.add Date.Extra.Minute 30 date)
-
-                eventPreview =
-                    { event = newEvent
-                    , position = xy
-                    , showDialog = False
-                    }
-            in
-                { model | eventPreview = Just eventPreview }
+            model
+                |> createEventPreview date xy 30
 
         ExtendEventPreview date xy ->
             model
@@ -196,6 +189,21 @@ updateCalendar msg model =
 
                     Just event ->
                         { model | events = updateEvents event }
+
+
+createEventPreview : Date -> Mouse.Position -> Int -> Model -> Model
+createEventPreview date xy minutes model =
+    let
+        newEvent =
+            Event (newEventId model.curEventId) "" date (Date.Extra.add Date.Extra.Minute minutes date)
+
+        eventPreview =
+            { event = newEvent
+            , position = xy
+            , showDialog = False
+            }
+    in
+        { model | eventPreview = Just eventPreview }
 
 
 selectEvent : String -> Model -> Model
@@ -385,9 +393,9 @@ eventConfig =
 timeSlotConfig : Calendar.TimeSlotConfig CalendarMsg
 timeSlotConfig =
     Calendar.timeSlotConfig
-        { onClick = \date -> Just <| SelectDate date
-        , onMouseEnter = \_ -> Nothing
-        , onMouseLeave = \_ -> Nothing
+        { onClick = \date xy -> Just <| SelectDate date xy
+        , onMouseEnter = \_ _ -> Nothing
+        , onMouseLeave = \_ _ -> Nothing
         , onDragStart = \date xy -> Just <| CreateEventPreview date xy
         , onDragging = \date xy -> Just <| ExtendEventPreview date xy
         , onDragEnd = \date xy -> Just <| ShowCreateEventDialog date xy

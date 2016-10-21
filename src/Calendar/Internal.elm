@@ -66,19 +66,19 @@ update eventConfig timeSlotConfig msg state =
             , Nothing
             )
 
-        TimeSlotClick date ->
+        TimeSlotClick date xy ->
             ( state
-            , timeSlotConfig.onClick date
+            , timeSlotConfig.onClick date xy
             )
 
-        TimeSlotMouseEnter date ->
+        TimeSlotMouseEnter date xy ->
             ( state
-            , timeSlotConfig.onMouseEnter date
+            , timeSlotConfig.onMouseEnter date xy
             )
 
-        TimeSlotMouseLeave date ->
+        TimeSlotMouseLeave date xy ->
             ( state
-            , timeSlotConfig.onMouseLeave date
+            , timeSlotConfig.onMouseLeave date xy
             )
 
         TimeSlotDragStart date xy ->
