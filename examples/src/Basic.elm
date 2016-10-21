@@ -57,11 +57,7 @@ update msg model =
                         update updateMsg newModel
 
         SelectDate date ->
-            let
-                whatDate =
-                    Debug.log "date" date
-            in
-                model
+            model
 
 
 view : Model -> Html Msg

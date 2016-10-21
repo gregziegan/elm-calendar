@@ -12,6 +12,7 @@ import Dict exposing (Dict)
 import Time exposing (Time)
 import Mouse
 import String
+import Keyboard
 
 
 main : Program Never
@@ -26,7 +27,10 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.map SetCalendarState (Calendar.subscriptions model.calendarState)
+    Sub.batch
+        [ Sub.map SetCalendarState (Calendar.subscriptions model.calendarState)
+        , Keyboard.downs CancelEventPreview
+        ]
 
 
 type alias Model =
@@ -80,6 +84,7 @@ type Msg
     = SetCalendarState Calendar.Msg
     | CreateEventTitle String
     | AddEventPreviewToEvents
+    | CancelEventPreview Int
 
 
 type CalendarMsg
@@ -123,6 +128,15 @@ pureUpdate msg model =
             model
                 |> addEventPreviewToEvents
                 |> removeEventPreview
+
+        CancelEventPreview keyCode ->
+            case keyCode of
+                27 ->
+                    model
+                        |> removeEventPreview
+
+                _ ->
+                    model
 
 
 updateCalendar : CalendarMsg -> Model -> Model
@@ -215,7 +229,7 @@ extendEventPreview : Date -> Mouse.Position -> Model -> Model
 extendEventPreview date xy model =
     let
         extend ({ event, position } as eventPreview) =
-            { eventPreview | event = { event | end = date } }
+            { eventPreview | event = { event | end = Debug.log "finalEnd" date } }
     in
         { model | eventPreview = Maybe.map extend model.eventPreview }
 
@@ -223,8 +237,17 @@ extendEventPreview date xy model =
 addEventPreviewToEvents : Model -> Model
 addEventPreviewToEvents model =
     let
+        defaultEmptyTitle event =
+            { event
+                | title =
+                    if event.title == "" then
+                        "(No Title)"
+                    else
+                        event.title
+            }
+
         addToEvents event =
-            Dict.insert event.id event model.events
+            Dict.insert event.id (Debug.log "newEvent" (defaultEmptyTitle event)) model.events
     in
         { model
             | events =
@@ -245,7 +268,6 @@ newEventId eventId =
         |> Result.withDefault 0
         |> (+) 1
         |> toString
-        |> Debug.log "newEventId"
 
 
 view : Model -> Html Msg
@@ -297,7 +319,7 @@ viewCreateEvent ({ event, position, showDialog } as preview) =
                 , "z-index" => "2"
                 ]
             ]
-            [ if Debug.log "showDialog" showDialog then
+            [ if showDialog then
                 viewCreateEventDialog preview
               else
                 text ""
