@@ -3,7 +3,6 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, style, value)
 import Html.Events exposing (onInput, onClick)
-import Html.App as Html
 import Calendar
 import Date exposing (Date)
 import Date.Extra
@@ -15,7 +14,6 @@ import String
 import Keyboard
 
 
-main : Program Never
 main =
     Html.program
         { init = init
@@ -144,7 +142,7 @@ updateCalendar msg model =
     case Debug.log "calendarMsg" msg of
         SelectDate date xy ->
             model
-                |> createEventPreview date xy 30
+                |> createEventPreview date xy 60
                 |> showCreateEventDialog
 
         CreateEventPreview date xy ->

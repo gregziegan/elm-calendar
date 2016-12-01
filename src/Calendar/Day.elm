@@ -6,9 +6,9 @@ import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Config exposing (ViewConfig)
+import Json.Decode as Json
 import Helpers
 import Calendar.Msg exposing (Msg(..))
-import Json.Decode as Json exposing ((:=))
 import Mouse
 import Calendar.Event as Event exposing (rangeDescription)
 

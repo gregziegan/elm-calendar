@@ -34,12 +34,10 @@ Hey it's a calendar!
 -}
 
 import Html exposing (..)
-import Html.App as Html
 import Date exposing (Date)
 import Config
 import Calendar.Internal as Internal
 import Calendar.Msg
-import Html.App as Html
 import Calendar.Msg as InternalMsg
 import Time exposing (Time)
 import Mouse

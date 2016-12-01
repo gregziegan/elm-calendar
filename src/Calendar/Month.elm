@@ -30,7 +30,7 @@ viewMonthHeader =
         viewDayOfWeek int =
             viewDay <| Date.Extra.Facts.dayOfWeekFromWeekdayNumber int
     in
-        div [ class "elm-calendar--row" ] (List.map viewDayOfWeek [0..6])
+        div [ class "elm-calendar--row" ] (List.map viewDayOfWeek (List.range 0 6))
 
 
 viewDay : Date.Day -> Html Msg
@@ -74,11 +74,6 @@ viewMonthRowContent config events selectedId week =
             (datesRow :: eventRows)
 
 
-maybeAndThen : (a -> Maybe b) -> Maybe a -> Maybe b
-maybeAndThen =
-    flip Maybe.andThen
-
-
 viewWeekEvent : ViewConfig event -> List Date -> Maybe String -> event -> Maybe (Html Msg)
 viewWeekEvent config week selectedId event =
     let
@@ -86,4 +81,4 @@ viewWeekEvent config week selectedId event =
             rangeDescription (config.start event) (config.end event) Date.Extra.Sunday sunday
     in
         Maybe.map eventRange (List.head week)
-            |> maybeAndThen (Event.maybeViewMonthEvent config event selectedId)
+            |> Maybe.andThen (Event.maybeViewMonthEvent config event selectedId)

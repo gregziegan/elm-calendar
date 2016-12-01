@@ -1,13 +1,11 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Html.App as Html
 import Calendar
 import Date exposing (Date)
 import Fixtures
 
 
-main : Program Never
 main =
     Html.beginnerProgram
         { model = model
