@@ -369,8 +369,7 @@ viewConfig =
                         , ( "elm-calendar--event-content--is-selected", isSelected )
                         ]
                     , children =
-                        [ div []
-                            [ text <| event.title ]
+                        [ text <| event.title
                         ]
                     }
         }

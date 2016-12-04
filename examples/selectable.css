@@ -9,6 +9,7 @@ h3 {
 .event-preview {
   width: 100px;
   background-color: #f4f4f4;
+  user-select: none;
 }
 
 .elm-calendar--event-content--is-selected {

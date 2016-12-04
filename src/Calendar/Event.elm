@@ -3,7 +3,7 @@ module Calendar.Event exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, style)
+import Html.Attributes exposing (class, classList, style, draggable)
 import Html.Events exposing (..)
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Config exposing (ViewConfig)

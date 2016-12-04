@@ -1,0 +1,52 @@
+.event-dialog {
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  color: rgb(85, 85, 85);
+  background-color: rgb(255, 255, 255);
+  transition: transform 250ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, opacity 250ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px;
+  border-radius: 2px;
+  opacity: 1;
+  transform: scale(1, 1);
+  position: fixed;
+  /*max-height: 100%;*/
+  /*margin-top: 5px;*/
+}
+
+.event-dialog__buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button {
+  display: inline-block;
+  transition: border-color .15s ease-in-out,box-shadow .1s ease-in-out,background-color .17s ease-in-out,color .15s ease-in-out;
+  margin: 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0 2.25em;
+  min-width: 8.3334em;
+  overflow: visible;
+  vertical-align: middle;
+  text-align: center;
+  text-decoration: none;
+  line-height: 2.34;
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.event-dialog__details {
+  background-color: #fbfbfb;
+  color: #333;
+}
+
+.event-dialog__signup {
+  background-color: #555;
+  color: #fff;
+}

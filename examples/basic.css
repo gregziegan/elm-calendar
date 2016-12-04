@@ -229,6 +229,7 @@
   background-color: #5fb4ca;
   color: white;
   cursor: pointer;
+  user-select: none;
 }
 
 .elm-calendar--month-starts-and-ends {
