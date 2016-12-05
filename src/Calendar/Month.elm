@@ -7,7 +7,7 @@ import Date.Extra
 import Date.Extra.Facts
 import Config exposing (ViewConfig)
 import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (Msg)
+import Calendar.Messages exposing (Msg)
 import Calendar.Event as Event exposing (rangeDescription)
 
 

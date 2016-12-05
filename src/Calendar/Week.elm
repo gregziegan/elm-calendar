@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDate, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
-import Calendar.Msg exposing (Msg)
+import Calendar.Messages exposing (Msg)
 import Config exposing (ViewConfig)
 import Calendar.Helpers as Helpers
 

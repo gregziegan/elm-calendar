@@ -5,7 +5,7 @@ import Date.Extra
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, style, draggable)
 import Html.Events exposing (..)
-import Calendar.Msg exposing (Msg(..), TimeSpan(..))
+import Calendar.Messages exposing (Msg(..), TimeSpan(..))
 import Config exposing (ViewConfig)
 import Json.Decode as Json
 import Mouse
@@ -215,9 +215,9 @@ eventSegment config event selectedId eventRange timeSpan =
             config.event event isSelected
     in
         node nodeName
-            ([ onClick <| EventClick eventId
-             , onMouseEnter <| EventMouseEnter eventId
-             , onMouseLeave <| EventMouseLeave eventId
+            ([ on "click" <| Json.map (EventClick eventId) Mouse.position
+             , on "mouseenter" <| Json.map (EventMouseEnter eventId) Mouse.position
+             , on "mouseleave" <| Json.map (EventMouseLeave eventId) Mouse.position
              , on "mousedown" <| Json.map (EventDragStart eventId) Mouse.position
              ]
                 ++ eventStyling config event eventRange timeSpan classes

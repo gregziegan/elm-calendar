@@ -6,6 +6,7 @@ import Helpers exposing ((<<<), (=>))
 import Keyboard.Extra
 import Messages exposing (..)
 import Model exposing (Model, initialModel)
+import Models.EventDialog as EventDialog
 import Navigation
 import Routing exposing (Route(..), reverse, routeFromResult)
 
@@ -49,12 +50,16 @@ update msg model =
             model
                 => []
 
-        EventClick eventId ->
-            { model | maybeEventDetails = Dict.get eventId model.events }
+        EventClick eventId { x, y } ->
+            { model
+                | eventDialog =
+                    Dict.get eventId model.events
+                        |> Maybe.map (EventDialog.init x y)
+            }
                 => []
 
         CloseDialog ->
-            { model | maybeEventDetails = Nothing } => []
+            { model | eventDialog = Nothing } => []
 
         KeyboardExtraMsg keyMsg ->
             let
@@ -66,11 +71,11 @@ update msg model =
             in
                 { model
                     | keyboardModel = keyboardModel
-                    , maybeEventDetails =
-                        if model.maybeEventDetails /= Nothing && escapeIsPressed then
+                    , eventDialog =
+                        if model.eventDialog /= Nothing && escapeIsPressed then
                             Nothing
                         else
-                            model.maybeEventDetails
+                            model.eventDialog
                 }
                     => [ Cmd.map KeyboardExtraMsg keyboardCmd ]
 
@@ -78,12 +83,12 @@ update msg model =
 eventConfig : Calendar.EventConfig Msg
 eventConfig =
     Calendar.eventConfig
-        { onClick = Just << EventClick
-        , onMouseEnter = \_ -> Nothing
-        , onMouseLeave = \_ -> Nothing
-        , onDragStart = \_ -> Nothing
-        , onDragging = \_ _ -> Nothing
-        , onDragEnd = \_ _ -> Nothing
+        { onClick = Just <<< EventClick
+        , onMouseEnter = \_ _ -> Nothing
+        , onMouseLeave = \_ _ -> Nothing
+        , onDragStart = \_ _ -> Nothing
+        , onDragging = \_ _ _ -> Nothing
+        , onDragEnd = \_ _ _ -> Nothing
         }
 
 

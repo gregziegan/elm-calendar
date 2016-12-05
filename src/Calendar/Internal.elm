@@ -10,7 +10,7 @@ import Calendar.Agenda as Agenda
 import Calendar.Day as Day
 import Calendar.Month as Month
 import Calendar.Week as Week
-import Calendar.Msg exposing (Msg(..), TimeSpan(..))
+import Calendar.Messages exposing (Msg(..), TimeSpan(..))
 import Mouse
 import Time exposing (Time)
 
@@ -95,34 +95,34 @@ update eventConfig timeSlotConfig msg state =
             , timeSlotConfig.onDragEnd (getNewDateBasedOnPosition date xy state) xy
             )
 
-        EventClick eventId ->
+        EventClick eventId xy ->
             ( { state | selected = Just eventId }
-            , eventConfig.onClick eventId
+            , eventConfig.onClick eventId xy
             )
 
-        EventMouseEnter eventId ->
+        EventMouseEnter eventId xy ->
             ( state
-            , eventConfig.onMouseEnter eventId
+            , eventConfig.onMouseEnter eventId xy
             )
 
-        EventMouseLeave eventId ->
+        EventMouseLeave eventId xy ->
             ( state
-            , eventConfig.onMouseLeave eventId
+            , eventConfig.onMouseLeave eventId xy
             )
 
         EventDragStart eventId xy ->
             ( { state | dragState = Just { start = xy, current = xy, kind = Event eventId } }
-            , eventConfig.onDragStart eventId
+            , eventConfig.onDragStart eventId xy
             )
 
         EventDragging eventId xy ->
             ( { state | dragState = (Maybe.map (\{ start, kind } -> Drag start xy kind) state.dragState) }
-            , eventConfig.onDragging eventId (getTimeDiffForPosition xy state)
+            , eventConfig.onDragging eventId xy (getTimeDiffForPosition xy state)
             )
 
         EventDragEnd eventId xy ->
             ( { state | dragState = Nothing }
-            , eventConfig.onDragEnd eventId (getTimeDiffForPosition xy state)
+            , eventConfig.onDragEnd eventId xy (getTimeDiffForPosition xy state)
             )
 
 

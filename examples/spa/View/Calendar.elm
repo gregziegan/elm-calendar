@@ -2,13 +2,14 @@ module View.Calendar exposing (..)
 
 import Calendar
 import Dict exposing (Dict)
-import Helpers
+import Helpers exposing ((=>), px)
 import Html exposing (Html, button, div, p, text)
 import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (onClick)
 import Messages exposing (..)
 import Model exposing (Model)
 import Models.Event exposing (Event, allEvents)
+import Models.EventDialog exposing (EventDialog)
 import Routing exposing (..)
 
 
@@ -20,14 +21,14 @@ view model =
     in
         div []
             [ Html.map SetCalendarState (Calendar.view (viewConfig model) events model.calendarState)
-            , model.maybeEventDetails
+            , model.eventDialog
                 |> Maybe.map viewEventDialog
                 |> Maybe.withDefault (text "")
             ]
 
 
-viewEventDialog : Event -> Html Msg
-viewEventDialog event =
+viewEventDialog : EventDialog -> Html Msg
+viewEventDialog ({ event } as dialog) =
     let
         timeRangeText =
             toString event.start ++ " - " ++ toString event.end
@@ -41,10 +42,10 @@ viewEventDialog event =
             ]
             [ div
                 [ class "event-dialog"
-                  -- , style
-                  -- [ "top" => px 10
-                  -- , "left" => px 10
-                  -- ]
+                , style
+                    [ "top" => px dialog.top
+                    , "left" => px dialog.left
+                    ]
                 ]
                 [ p [] [ text event.title ]
                 , p [] [ text timeRangeText ]
@@ -53,7 +54,6 @@ viewEventDialog event =
                     [ Helpers.navLink
                         (button
                             [ class "event-dialog__details"
-                              -- , onClick <| RouteTo <| EventRoute event.id
                             ]
                             [ text "Details" ]
                         )

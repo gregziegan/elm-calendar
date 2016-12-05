@@ -17,7 +17,7 @@ import Json.Decode as Decode
 
 
 px num =
-    toString px ++ "px"
+    (toString num) ++ "px"
 
 
 onClickNoDefault : msg -> Attribute msg

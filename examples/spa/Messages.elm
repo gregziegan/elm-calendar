@@ -12,6 +12,6 @@ type Msg
     | NavigateTo Route
     | SetCalendarState Calendar.Msg
     | SelectDate Date Mouse.Position
-    | EventClick String
+    | EventClick String Mouse.Position
     | CloseDialog
     | KeyboardExtraMsg Keyboard.Extra.Msg

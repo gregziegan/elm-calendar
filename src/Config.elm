@@ -4,7 +4,7 @@ import Date exposing (Date)
 import Time exposing (Time)
 import Mouse
 import Html exposing (Html, Attribute)
-import Calendar.Msg as InternalMsg
+import Calendar.Messages as InternalMsg
 
 
 type alias EventView =
@@ -34,10 +34,10 @@ type alias TimeSlotConfig msg =
 
 
 type alias EventConfig msg =
-    { onClick : String -> Maybe msg
-    , onMouseEnter : String -> Maybe msg
-    , onMouseLeave : String -> Maybe msg
-    , onDragStart : String -> Maybe msg
-    , onDragging : String -> Time -> Maybe msg
-    , onDragEnd : String -> Time -> Maybe msg
+    { onClick : String -> Mouse.Position -> Maybe msg
+    , onMouseEnter : String -> Mouse.Position -> Maybe msg
+    , onMouseLeave : String -> Mouse.Position -> Maybe msg
+    , onDragStart : String -> Mouse.Position -> Maybe msg
+    , onDragging : String -> Mouse.Position -> Time -> Maybe msg
+    , onDragEnd : String -> Mouse.Position -> Time -> Maybe msg
     }
