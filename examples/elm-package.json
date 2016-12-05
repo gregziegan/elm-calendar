@@ -4,7 +4,9 @@
     "repository": "https://github.com/thebritican/elm-calendar.git",
     "license": "BSD3",
     "source-directories": [
-        "src",
+        "standalone",
+        "spa",
+        "fixtures",
         "../src"
     ],
     "exposed-modules": [],

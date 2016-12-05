@@ -6,7 +6,7 @@ import Date exposing (Date)
 import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDate, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
 import Calendar.Msg exposing (Msg)
 import Config exposing (ViewConfig)
-import Helpers
+import Calendar.Helpers as Helpers
 
 
 viewWeekContent :

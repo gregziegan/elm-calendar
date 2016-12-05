@@ -7,7 +7,7 @@ import Date exposing (Date)
 import Date.Extra
 import Config exposing (ViewConfig)
 import Json.Decode as Json
-import Helpers
+import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..))
 import Mouse
 import Calendar.Event as Event exposing (rangeDescription)

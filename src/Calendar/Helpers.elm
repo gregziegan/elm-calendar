@@ -1,4 +1,4 @@
-module Helpers exposing (..)
+module Calendar.Helpers exposing (..)
 
 import Date exposing (Date)
 import Date.Extra

@@ -9,7 +9,7 @@ import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Config exposing (ViewConfig)
 import Json.Decode as Json
 import Mouse
-import Helpers
+import Calendar.Helpers as Helpers
 
 
 type EventRange

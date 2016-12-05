@@ -4,7 +4,7 @@ import Date exposing (Date)
 import Date.Extra
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Helpers
+import Calendar.Helpers as Helpers
 import Config exposing (ViewConfig)
 
 
