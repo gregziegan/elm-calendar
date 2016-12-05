@@ -1,6 +1,7 @@
 module Main exposing (..)
 
-import Messages exposing (Msg(UrlUpdate))
+import Keyboard.Extra
+import Messages exposing (..)
 import Model exposing (Model, initialModel)
 import Navigation
 import Routing exposing (Route, routeFromResult, routeParser)
@@ -13,9 +14,14 @@ main =
     Navigation.program parser
         { init = init
         , update = batchCmds
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         , view = view
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.map KeyboardExtraMsg Keyboard.Extra.subscriptions
 
 
 batchCmds : Msg -> Model -> ( Model, Cmd Msg )

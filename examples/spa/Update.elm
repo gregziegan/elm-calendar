@@ -2,11 +2,12 @@ module Update exposing (..)
 
 import Calendar
 import Dict
+import Helpers exposing ((<<<), (=>))
+import Keyboard.Extra
 import Messages exposing (..)
 import Model exposing (Model, initialModel)
 import Navigation
-import Routing exposing (Route(..), routeFromResult, reverse)
-import Helpers exposing ((=>), (<<<))
+import Routing exposing (Route(..), reverse, routeFromResult)
 
 
 urlUpdate : Route -> Model -> ( Model, List (Cmd Msg) )
@@ -54,6 +55,24 @@ update msg model =
 
         CloseDialog ->
             { model | maybeEventDetails = Nothing } => []
+
+        KeyboardExtraMsg keyMsg ->
+            let
+                ( keyboardModel, keyboardCmd ) =
+                    Keyboard.Extra.update keyMsg model.keyboardModel
+
+                escapeIsPressed =
+                    Keyboard.Extra.isPressed Keyboard.Extra.Escape keyboardModel
+            in
+                { model
+                    | keyboardModel = keyboardModel
+                    , maybeEventDetails =
+                        if model.maybeEventDetails /= Nothing && escapeIsPressed then
+                            Nothing
+                        else
+                            model.maybeEventDetails
+                }
+                    => [ Cmd.map KeyboardExtraMsg keyboardCmd ]
 
 
 eventConfig : Calendar.EventConfig Msg

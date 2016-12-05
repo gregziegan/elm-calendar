@@ -2,6 +2,7 @@ module Messages exposing (..)
 
 import Calendar
 import Date exposing (Date)
+import Keyboard.Extra
 import Mouse
 import Routing exposing (Route)
 
@@ -13,3 +14,4 @@ type Msg
     | SelectDate Date Mouse.Position
     | EventClick String
     | CloseDialog
+    | KeyboardExtraMsg Keyboard.Extra.Msg
