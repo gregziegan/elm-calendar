@@ -11,7 +11,7 @@ cache:
 
 install:
   - npm install -g elm@~0.18.0
-  - npm install -g elm-test
+  - npm install -g elm-test@0.18.2
   - npm install
 
 script:
