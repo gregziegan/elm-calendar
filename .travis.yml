@@ -10,10 +10,9 @@ cache:
     - tests/elm-stuff/build-artifacts
 
 install:
-  - npm install -g elm elm-test
+  - npm install -g elm@~0.18.0
+  - npm install -g elm-test@0.18.2
   - npm install
-  - git clone https://github.com/NoRedInk/elm-ops-tooling
-  - elm-ops-tooling/with_retry.rb elm package install --yes
 
 script:
-  - elm-test
+  - "elm-test --verbose"
